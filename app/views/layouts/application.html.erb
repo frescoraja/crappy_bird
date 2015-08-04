@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CrappyBird</title>
+  <link href='http://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+
+<%= yield %>
+
+<footer>© <a href="http://www.djc.space">David James Carter</a></footer>
+
+</body>
+</html>
+
+<script>
+  $(window).load(function () {
+    var canvas = document.getElementById('game-canvas');
+    canvas.height = 644;
+    canvas.width = 432;
+    var ctx = canvas.getContext('2d');
+    var game = new CrappyBird.Game();
+    var gameView = new CrappyBird.GameView(game, ctx);
+  });
+</script>
