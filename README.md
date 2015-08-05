@@ -1,3 +1,3 @@
 #CrappyBird! 
 ##Flappy Bird - made by me in Javascript. to celebrate Independence Day! 2015
-<img scr="https://github.com/frescoraja/crappy_bird/blob/master/public/crappybird.gif" wdith="50%">
+<img scr="https://dl.dropboxusercontent.com/u/79106337/crappybird.gif" wdith="50%">
