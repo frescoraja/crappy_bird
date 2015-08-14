@@ -19,10 +19,12 @@
 <script>
   $(window).load(function () {
     var canvas = document.getElementById('game-canvas');
-    canvas.height = 644;
-    canvas.width = 432;
+    var x = 432,
+        y = 644;
+    canvas.height = y;
+    canvas.width = x;
     var ctx = canvas.getContext('2d');
-    var game = new CrappyBird.Game();
+    var game = new CrappyBird.Game(x,y);
     var gameView = new CrappyBird.GameView(game, ctx);
   });
 </script>

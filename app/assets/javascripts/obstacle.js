@@ -3,62 +3,58 @@
     window.CrappyBird = {};
   }
 
-  function randomColor () {
-    var hexDigits = "0123456789ABCDEF";
-    var color = "#";
-    for (var i = 0; i < 3; i++) {
-      color += hexDigits[Math.floor((Math.random() * 16))];
-    }
-
-    return color;
-  }
-
-  var Obstacle = CrappyBird.Obstacle = function (options) {
-    this.color = randomColor();
+  var Obstacle = CrappyBird.Obstacle = function (game, startX) {
+    this.game = game;
     this.pipes = new CrappyBird.Images().pipes;
-    this.top = this.pipes[0];
-    this.bottom = this.pipes[1];
-    this.pos = options.pos;
-    this.height = options.height;
-    this.width = options.width;
-    this.gap = options.gap;
-    this.openingTop = this.height;
-    this.openingBottom = this.height + this.gap;
-    this.speed = options.speed;
-    this.game = options.game;
+    var heights = this.generateHeights();
+    this.bottomHeight = heights[0];
+    this.topHeight = heights[1];
+    this.width = 80;
+    this.pos = startX || this.game.dimX;
+    this.topOpening = this.topHeight;
+    this.bottomOpening = this.topHeight + 130;
+    this.point = new CrappyBird.Sounds().point;
+    this.gavePoint = false;
+  };
+
+  Obstacle.prototype.generateHeights = function () {
+    var gapSize = 130;
+    var aboveGround = this.game.dimY - 100;
+    var pipeAbleSpace = aboveGround - gapSize;
+    var minHeight =  pipeAbleSpace * 0.1;
+    var maxHeight = pipeAbleSpace * 0.9;
+
+    var topHeight = Math.floor(Math.random() * (maxHeight - minHeight)) + minHeight;
+    var bottomHeight = pipeAbleSpace - topHeight;
+    return [bottomHeight, topHeight];
   };
 
   Obstacle.prototype.draw = function (ctx) {
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.pos[0] + 8, 0, this.width - 16, this.height - 56);
-    ctx.fillRect(this.pos[0], this.height - 56, this.width, 56);
-    ctx.drawImage(this.top,
-                  0, CrappyBird.Game.DIM_Y - this.height,
-                  this.width, this.height,
-                  this.pos[0], 0,
-                  this.width,
-                  this.height);
-    ctx.fillRect(this.pos[0], this.openingBottom, this.width, 56);
-    ctx.fillRect(this.pos[0] + 8,
-                 this.gap + this.height + 56,
-                 this.width - 16,
-                 CrappyBird.Game.DIM_Y - (this.height + this.gap + 56));
-    ctx.drawImage(this.bottom,
-                  0, 0, this.width, CrappyBird.Game.DIM_Y - (this.height + this.gap),
-                  this.pos[0],
-                  this.gap + this.height,
-                  this.width,
-                  CrappyBird.Game.DIM_Y - (this.height + this.gap));
+    ctx.drawImage(this.pipes[0],
+                  this.pos, this.topHeight - this.game.dimY,
+                  this.width, this.game.dimY);
+    ctx.drawImage(this.pipes[1],
+                  0, 0,
+                  this.pipes[1].width, (this.bottomHeight / this.game.dimY) * this.pipes[1].height,
+                  this.pos, this.game.dimY - 100 - this.bottomHeight,
+                  this.width, this.bottomHeight);
   };
 
   Obstacle.prototype.move = function () {
-    if (this.pos[0] + this.width < 0) {
+    if (this.pos + this.width < 0) {
       this.remove();
     }
-    if (this.pos[0] >= 500 && this.pos[0] < 501) {
+    if (this.pos >= 90 && this.pos < 92) {
       this.game.addObstacle();
     }
-    this.pos[0] += this.speed;
+    this.pos += -3;
+    if (this.pos + this.width <= this.game.birdy.pos[0]) {
+      if (!this.gavePoint) {
+        this.gavePoint = true;
+        this.game.score += 1;
+        this.point.play();
+      }
+    }
   };
 
   Obstacle.prototype.remove = function () {

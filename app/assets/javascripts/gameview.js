@@ -5,100 +5,142 @@
 
   var GameView = CrappyBird.GameView = function (game, ctx) {
     this.images = new CrappyBird.Images();
+    this.sounds = new CrappyBird.Sounds();
     this.game = game;
     this.ctx = ctx;
-    this.dimX = ctx.width;
-    this.dimY = ctx.height;
-    this.birdy = this.game.addBirdy();
-    this.game.addObstacle();
-    this.timerId = null;
-    this.isPaused = false;
-    this.landing = this.images.landing;
-    this.bg = this.images.bg;
-    this.showLanding(true);
+    this.dimX = ctx.canvas.width;
+    this.dimY = ctx.canvas.height;
+    this.allowInput = false;
+    this.cancelKeys = false;
+    this.showLanding();
+
     this.bindKeyHandlers();
-    this.bindEventHandlers();
   };
 
   GameView.prototype.bindKeyHandlers = function () {
-    var birdy = this.birdy;
+    var birdy = this.game.birdy;
     var gameView = this;
-    key('space', function () {
-      $('.landing').hide();
-      this.showLanding(false);
-      gameView.start();
-    });
-    key('up', function () {
-      birdy.fly();
-    });
+    if (!this.cancelKeys) {
+      key('space', function () {
+        if (gameView.allowInput) {
+          birdy.fly();
+        } else {
+          window.cancelAnimationFrame(landingId);
+          $('.landing').hide();
+          gameView.allowInput = true;
+          gameView.start();
+        }
+      });
+    }
   };
 
-  GameView.prototype.bindEventHandlers = function () {
-    $('.press-start').click(this.start.bind(this));
+  GameView.prototype.handleGameOver = function (skyX, groundX) {
+    this.allowInput = false;
+    this.cancelKeys = true;
+    this.sounds.die.play();
+    var sky = this.images.sky;
+    var ground = this.images.ground;
+    var gameView = this;
+    var groundHeight = this.dimY - 100;
+    (function renderDead () {
+      deadId = window.requestAnimationFrame(renderDead);
+
+      gameView.ctx.clearRect(0, 0, gameView.dimX, gameView.dimY);
+      gameView.ctx.drawImage(sky, skyX, 0, 966, gameView.dimY);
+      gameView.ctx.drawImage(sky, 966-Math.abs(skyX), 0, 966, gameView.dimY);
+      gameView.ctx.drawImage(ground, groundX, groundHeight);
+      gameView.ctx.drawImage(ground, gameView.dimX - Math.abs(groundX), groundHeight);
+      gameView.game.step();
+      gameView.game.draw(gameView.ctx);
+    })();
+
+      gameView.sounds.hit.play();
   };
 
-  GameView.prototype.showLanding = function (state) {
-    var posY = 250;
-    var dPosY = 265;
-    var vel = 1;
+  GameView.prototype.showLanding = function () {
+    var birdy = { img: this.images.birdies,
+                  posX: 175,
+                  posY: 215,
+                  vel: 1};
+    var dudu = { img: this.images.dudu,
+                 posX: 165,
+                 posY: 230,
+                 vel: 2,
+                 poo: this.sounds.poo
+               };
     var view = this;
-    var img = this.birdy.images[4];
-    var dudu = new CrappyBird.Images().dudu;
-    var poo = new CrappyBird.Sounds().poo;
-    var duduVel = 3;
-    (function renderLanding (state) {
-      window.requestAnimationFrame(renderLanding);
-      view.ctx.clearRect(0, 0, 432, 644);
-      view.ctx.drawImage(view.bg, 0, 0, 966, 644);
-      posY += vel;
-      dPosY += duduVel;
-      view.ctx.drawImage(img, 175 , posY, 45, 45);
-      view.ctx.drawImage(dudu, 165 , dPosY, 15, 15);
-      if (posY >= 300) {
-        vel = -1;
-        img = view.birdy.images[0];
-      } else if (posY <= 215) {
-        vel = 1;
-        img = view.birdy.images[3];
+    var sky = this.images.sky;
+    var ground = this.images.ground;
+    var birdyImg = birdy.img[3];
+    (function renderLanding () {
+      landingId = window.requestAnimationFrame(renderLanding);
+      view.ctx.clearRect(0, 0, view.dimX, view.dimY);
+      view.ctx.drawImage(sky, 0, 0, 966, view.dimY);
+      view.ctx.drawImage(ground, 0, view.dimY - 100);
+      view.ctx.drawImage(birdyImg, birdy.posX, birdy.posY, 50, 45);
+      view.ctx.drawImage(dudu.img, dudu.posX, dudu.posY, 15, 15);
+
+      if (dudu.posY === birdy.posY + 15) {
+        dudu.poo.play();
       }
-      if (dPosY >= 630) {
-        dPosY = posY + 15;
+
+      birdy.posY += birdy.vel;
+      dudu.vel += 0.2;
+      dudu.posY += dudu.vel;
+
+      if (birdy.posY >= 300) {
+        birdy.vel = -1;
+        birdyImg = birdy.img[0];
+      } else if (birdy.posY <= 215) {
+        birdy.vel = 1;
+        birdyImg = birdy.img[3];
+        dudu.vel = 2;
+        dudu.posY = birdy.posY + 15;
+        dudu.poo.play();
       }
     })();
   };
 
   GameView.prototype.start = function () {
-    var vx = 0;
+    var groundX = 0;
+    var skyX = 0;
     var gameView = this;
-    var img = this.bg;
+    var ctx = this.ctx;
+    var sky = this.images.sky;
+    var ground = this.images.ground;
+    var groundHeight = this.dimY - 100;
     (function renderGame() {
-      window.requestAnimationFrame(renderGame);
-      gameView.ctx.clearRect(0,0, 432, 644);
+      if (gameView.game.gameOver) {
+        window.cancelAnimationFrame(gameId);
+        gameView.handleGameOver(skyX, groundX);
+      } else {
+        gameId = window.requestAnimationFrame(renderGame);
+        ctx.clearRect(0,0, gameView.dimX, gameView.dimY);
 
-      gameView.ctx.drawImage(img, vx, 0);
-      gameView.ctx.drawImage(img, img.width-Math.abs(vx), 0);
-      if (Math.abs(vx) > img.width) {
-        vx = 0;
+        ctx.drawImage(sky, skyX, 0, 966, gameView.dimY);
+        ctx.drawImage(sky, 966-Math.abs(skyX), 0, 966, gameView.dimY);
+        ctx.drawImage(ground, groundX, groundHeight);
+        ctx.drawImage(ground, gameView.dimX - Math.abs(groundX), groundHeight);
+        gameView.game.step();
+        gameView.game.draw(ctx);
+
+        ctx.font = '28px "Press Start 2P"';
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#3e2500";
+        ctx.fillText(gameView.game.score, gameView.dimX/2, 60);
+        ctx.strokeText(gameView.game.score, gameView.dimX/2, 60);
+
+        if (Math.abs(skyX) > 966) {
+          skyX = 0;
+        }
+        if (Math.abs(groundX) > ground.width) {
+          groundX = 0;
+        }
+        groundX -= 3;
+        skyX -= 0.75;
       }
-      vx -= 2;
     })();
   };
-
-
-  // GameView.prototype.start = function (start) {
-  //   this.bindKeyHandlers();
-
-    //   (function renderGame() {
-    //   window.requestAnimationFrame(renderGame);
-    //   gameView.ctx.clearRect(0,0, gameView.game.DIM_X, gameView.game.DIM_Y);
-    //
-    //   gameView.ctx.drawImage(img, vx, 0);
-    //   gameView.ctx.drawImage(img, img.width-Math.abs(vx), 0);
-    //   if (Math.abs(vx) > img.width) {
-    //     vx = 0;
-    //   }
-    //   vx -= 2;
-    // })();
-
-  // };
 })();
