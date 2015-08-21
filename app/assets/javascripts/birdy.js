@@ -11,7 +11,7 @@
     this.height = 45;
     this.width = 50;
     this.vel = 0;
-    this.acc = 0.9;
+    this.acc = 0.8;
     this.dead = false;
   };
 
@@ -27,7 +27,7 @@
   };
 
   Birdy.prototype.fly = function () {
-    this.vel = -10;
+    this.vel = -9;
     this.flySound.play();
   };
 

@@ -179,3 +179,13 @@ table tr:nth-child(even) {
   bottom: 18%;
   font-size: 18px;
 }
+
+.errors {
+  position: absolute;
+  color: red;
+  font-family: 'Press Start 2P';
+  font-size: 8px;
+  width: 100%;
+  text-align: center;
+  bottom: 0px;
+}

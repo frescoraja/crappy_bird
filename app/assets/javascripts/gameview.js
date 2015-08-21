@@ -37,12 +37,12 @@
   };
 
   GameView.prototype.handleGameOver = function (skyX, groundX, game) {
+    var gameView = this;
     window.cancelAnimationFrame(gameId);
     this.allowInput = false;
     this.sounds.die.play();
     var sky = this.images.sky;
     var ground = this.images.ground;
-    var gameView = this;
     var groundHeight = this.dimY - 100;
     var birdy = this.birdy;
     birdy.image = birdy.images[5];
@@ -78,6 +78,7 @@
     var numTableRows = document.getElementsByTagName('tr').length;
     $('#score-form-container').show();
     $('#input-score').val(score);
+    $('#input-name').show();
     $('#score-form').submit(function (e) {
       e.preventDefault();
       var newScoreData = $('#score-form').serializeJSON();
@@ -87,12 +88,14 @@
         data: newScoreData,
         dataType: "JSON",
         success: function (res) {
-          $('#input-name').empty().hide();
+          $('.errors').empty();
+          $('#input-name').val('').hide();
+          $('#input-score').val('');
           var name = res.name;
           var score = res.score;
 
           var $newTableData = $('<tr><td>' + name + '</td><td>' + score + '</td></tr>');
-          if (numTableRows >= 11) {
+          if (numTableRows >= 10) {
             $('tr').last().remove();
           }
           $('.scoreboard').append($newTableData);
@@ -100,7 +103,7 @@
         },
         error: function (res) {
           var msg = res.responseText;
-          $('body').append($('<div>').addClass('errors').text(msg));
+          $('.errors').text(msg);
         }
       });
     });
@@ -121,12 +124,19 @@
     var gameView = this;
     $('#scoreboard-container').show();
     $('#score').text(score);
-
+    $('.scoreboard').html('<th colspan="2">High Scores</th>');
     $.ajax({
       url: '/high_scores',
       success: function (res) {
+        res.forEach(function (highScore) {
+          var name = highScore.name;
+          var score = highScore.score;
+          var $tableRow = $('<tr>').append($('<td>').text(name));
+          $tableRow.append($('<td>').text(score));
+          $('.scoreboard').append($tableRow);
+        });
         var lowScore = parseInt(res.reverse()[0].score);
-        if (score > lowScore) {
+        if (score >= lowScore) {
           gameView.showScoreForm(score);
         } else {
           gameView.showRestart();
