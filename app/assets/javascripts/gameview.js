@@ -128,18 +128,22 @@
     $.ajax({
       url: '/high_scores',
       success: function (res) {
-        res.forEach(function (highScore) {
-          var name = highScore.name;
-          var score = highScore.score;
-          var $tableRow = $('<tr>').append($('<td>').text(name));
-          $tableRow.append($('<td>').text(score));
-          $('.scoreboard').append($tableRow);
-        });
-        var lowScore = parseInt(res.reverse()[0].score);
-        if (!lowScore || (score >= lowScore)) {
-          gameView.showScoreForm(score);
-        } else {
+        if (res) {
+          res.forEach(function (highScore) {
+            var name = highScore.name;
+            var score = highScore.score;
+            var $tableRow = $('<tr>').append($('<td>').text(name));
+            $tableRow.append($('<td>').text(score));
+            $('.scoreboard').append($tableRow);
+          });
+          var lowScore = parseInt(res.reverse()[0].score);
+          if (score >= lowScore) {
+            gameView.showScoreForm(score);
+          } else {
           gameView.showRestart();
+          }
+        } else {
+          gameView.showScoreForm(score);
         }
       }
      });
