@@ -5,21 +5,21 @@
 
   var Images = CrappyBird.Images = function () {
     this.landing = new Image();
-    this.landing.src = "assets/landing.png";
+    this.landing.src = "landing.png";
     this.sky = new Image();
-    this.sky.src = "assets/sky.png";
+    this.sky.src = "sky.png";
     this.birdy0 = new Image();
     this.birdy1 = new Image();
     this.birdy2 = new Image();
     this.birdy3 = new Image();
     this.birdy4 = new Image();
     this.birdy5 = new Image();
-    this.birdy0.src = "assets/flappy-birdup1.png";
-    this.birdy1.src = "assets/flappy-bird.png";
-    this.birdy2.src = "assets/flappy-birddown1.png";
-    this.birdy3.src = "assets/flappy-birddown2.png";
-    this.birdy4.src = "assets/flappy-birddown3.png";
-    this.birdy5.src = "assets/deadbirdy.png";
+    this.birdy0.src = "flappy-birdup1.png";
+    this.birdy1.src = "flappy-bird.png";
+    this.birdy2.src = "flappy-birddown1.png";
+    this.birdy3.src = "flappy-birddown2.png";
+    this.birdy4.src = "flappy-birddown3.png";
+    this.birdy5.src = "deadbirdy.png";
     this.birdies = [this.birdy0,
                     this.birdy1,
                     this.birdy2,
