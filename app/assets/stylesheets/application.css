@@ -15,7 +15,7 @@
  */
 
 .bg-image {
-   background: url('clouds.png') no-repeat center center fixed;
+   background: image-url('clouds.png') no-repeat center center fixed;
    background-size: cover;
    background-position: bottom center;
    position: absolute;
