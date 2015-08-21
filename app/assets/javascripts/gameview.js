@@ -136,7 +136,7 @@
           $('.scoreboard').append($tableRow);
         });
         var lowScore = parseInt(res.reverse()[0].score);
-        if (score >= lowScore) {
+        if (!lowScore || (score >= lowScore)) {
           gameView.showScoreForm(score);
         } else {
           gameView.showRestart();
