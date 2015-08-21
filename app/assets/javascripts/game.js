@@ -12,7 +12,7 @@
     this.score = 0;
     this.addObstacle(1000);
     this.sounds = new CrappyBird.Sounds();
-    this.gameOver = false;
+    this.over = false;
   };
 
   Game.prototype.addBirdy = function () {
@@ -35,16 +35,18 @@
 
   Game.prototype.checkCollision = function () {
     var birdy = this.birdy;
-    var view = this;
+    var game = this;
     this.obstacles.forEach(function (obstacle){
-      if (birdy.pos[1] + birdy.height >= view.dimY - 100) {
-        view.gameOver = true;
+      if (birdy.pos[1] + birdy.height >= game.dimY - 100) {
+        game.over = true;
+        birdy.dead = true;
       }
       if (birdy.pos[0] + birdy.width >= obstacle.pos &&
           birdy.pos[0] <= obstacle.pos + obstacle.width) {
         if (birdy.pos[1] <= obstacle.topOpening ||
             birdy.pos[1] + birdy.height >= obstacle.bottomOpening) {
-          view.gameOver = true;
+          game.over = true;
+          birdy.dead = true;
         }
       }
     });
@@ -57,13 +59,9 @@
   };
 
   Game.prototype.moveObjects = function () {
-    if (this.gameOver) {
-      this.birdy.dead();
-    } else {
-      this.allObjects().forEach(function (obj) {
-        obj.move();
-      });
-    }
+    this.allObjects().forEach(function (obj) {
+      obj.move();
+    });
   };
 
   Game.prototype.remove = function (obj) {
@@ -72,9 +70,8 @@
 
   Game.prototype.step = function () {
     this.moveObjects();
-    if (!this.gameOver) {
-      this.checkCollision();
-    }
+    this.checkCollision();
+
     return this;
   };
 })();

@@ -46,7 +46,6 @@
   top: 50%;
   margin-top: -372px;
   margin-left: -217px;
-
 }
 
 footer {
@@ -67,13 +66,16 @@ a {
   text-decoration: none;
 }
 
-.landing {
+.landing,
+.scoreboard, .game-over,
+.user-score, .restart,
+input {
+  position: absolute;
   border: 3px solid white;
   background-color: rgb(255, 92, 0);
   color: white;
   font-family: 'Press Start 2P';
   text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.71);
-  position: absolute;
   text-align: center;
   box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.71);
   outline: 6px solid black;
@@ -84,19 +86,96 @@ a {
   letter-spacing: 3px;
   padding: 20px 10px;
   text-transform: uppercase;
-  top: 20%;
+  top: 60px;
   left: 50%;
   margin-left: -119px;
 }
+
 .press-start {
   padding: 10px;
   font-size: 10px;
-  top: 56%;
+  bottom: 120px;
   left: 50%;
   margin-left: -114px;
 }
-.press-start:active {
+
+.press-start:hover {
+  bottom: 118px;
   margin-top: 2px;
   box-shadow: 0px 7px 2px rgba(0, 0, 0, 0.91);
   cursor: pointer;
+}
+
+.scoreboard {
+  width: 80%;
+  height: 50%;
+  top: 5%;
+  left: 10%;
+  padding: 20px;
+  letter-spacing: 1px;
+  margin: auto;
+}
+
+td {
+  border: 3px solid;
+}
+
+.game-over {
+  top: 5%;
+  padding: 5px 0px 5px;
+  width: 50%;
+  left: 25%;
+}
+
+.restart {
+  display: none;
+  font-size: 12px;
+  bottom: 10%;
+  width: 30%;
+  left: 35%;
+  padding: 2px;
+}
+
+.user-score {
+  text-align: left;
+  width: 40%;
+  left: 30%;
+  bottom: 33%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+}
+
+.user-score span {
+  float: right;
+  padding-right: 18px;
+}
+
+#scoreboard-container {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+#score-form-container {
+  display: none;
+  width: 75%;
+  margin: auto;
+}
+
+.restart:hover {
+  cursor: pointer;
+}
+
+table tr:nth-child(even) {
+  background-color: rgba(0,0,0, .5);
+}
+
+#input-name {
+  height: 69px;
+  width: 75%;
+  margin: auto;
+  bottom: 18%;
+  font-size: 18px;
 }

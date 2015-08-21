@@ -5,12 +5,12 @@ class HighScoresController < ApplicationController
   end
 
   def create
-    @high_scores = HighScore.new(high_score_params)
+    @high_score = HighScore.new(high_score_params)
 
-    if @score.save
-      render json: @high_scores, status: :ok
+    if @high_score.save
+      render json: @high_score, status: :ok
     else
-      render json: @high_scores.errors.full_messages, status: :unprocessable_entity
+      render json: @high_score.errors.full_messages, status: :unprocessable_entity
     end
   end
 

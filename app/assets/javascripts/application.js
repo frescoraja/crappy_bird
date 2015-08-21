@@ -12,6 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require serializejson
 //= require keymaster
 //= require images
 //= require birdy

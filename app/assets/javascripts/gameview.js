@@ -3,61 +3,142 @@
     window.CrappyBird = {};
   }
 
-  var GameView = CrappyBird.GameView = function (game, ctx) {
+  var GameView = CrappyBird.GameView = function (ctx) {
     this.images = new CrappyBird.Images();
     this.sounds = new CrappyBird.Sounds();
-    this.game = game;
     this.ctx = ctx;
     this.dimX = ctx.canvas.width;
     this.dimY = ctx.canvas.height;
-    this.allowInput = false;
-    this.cancelKeys = false;
+    this.started = false;
+    this.allowInput = true;
     this.showLanding();
-
-    this.bindKeyHandlers();
+    this.bindHandlers();
   };
 
-  GameView.prototype.bindKeyHandlers = function () {
-    var birdy = this.game.birdy;
+  GameView.prototype.bindHandlers = function () {
     var gameView = this;
-    if (!this.cancelKeys) {
-      key('space', function () {
-        if (gameView.allowInput) {
-          birdy.fly();
+    key('space', function () {
+      if (gameView.allowInput) {
+        if (gameView.started) {
+          gameView.birdy.fly();
         } else {
           window.cancelAnimationFrame(landingId);
-          $('.landing').hide();
-          gameView.allowInput = true;
+          gameView.started = true;
           gameView.start();
         }
-      });
-    }
+      }
+    });
+
+    $('.press-start').click(function () {
+      window.cancelAnimationFrame(landingId);
+      gameView.started = true;
+      gameView.start();
+    });
   };
 
-  GameView.prototype.handleGameOver = function (skyX, groundX) {
+  GameView.prototype.handleGameOver = function (skyX, groundX, game) {
+    window.cancelAnimationFrame(gameId);
     this.allowInput = false;
-    this.cancelKeys = true;
     this.sounds.die.play();
     var sky = this.images.sky;
     var ground = this.images.ground;
     var gameView = this;
     var groundHeight = this.dimY - 100;
+    var birdy = this.birdy;
+    birdy.image = birdy.images[5];
     (function renderDead () {
-      deadId = window.requestAnimationFrame(renderDead);
-
-      gameView.ctx.clearRect(0, 0, gameView.dimX, gameView.dimY);
-      gameView.ctx.drawImage(sky, skyX, 0, 966, gameView.dimY);
-      gameView.ctx.drawImage(sky, 966-Math.abs(skyX), 0, 966, gameView.dimY);
-      gameView.ctx.drawImage(ground, groundX, groundHeight);
-      gameView.ctx.drawImage(ground, gameView.dimX - Math.abs(groundX), groundHeight);
-      gameView.game.step();
-      gameView.game.draw(gameView.ctx);
+      if (birdy.vel === 0) {
+        gameView.sounds.hit.play();
+        window.cancelAnimationFrame(deadId);
+        setTimeout(function () {
+          gameView.showHighScores(game.score);
+        }, 500);
+      } else {
+        deadId = window.requestAnimationFrame(renderDead);
+        gameView.ctx.clearRect(0, 0, gameView.dimX, gameView.dimY);
+        gameView.ctx.drawImage(sky, skyX, 0, 966, gameView.dimY);
+        gameView.ctx.drawImage(sky, 966-Math.abs(skyX), 0, 966, gameView.dimY);
+        gameView.ctx.drawImage(ground, groundX, groundHeight);
+        gameView.ctx.drawImage(ground, gameView.dimX - Math.abs(groundX), groundHeight);
+        birdy.move();
+        game.draw(gameView.ctx);
+        gameView.ctx.font = '28px "Press Start 2P"';
+        gameView.ctx.fillStyle = "white";
+        gameView.ctx.textAlign = "center";
+        gameView.ctx.lineWidth = 2;
+        gameView.ctx.strokeStyle = "#3e2500";
+        gameView.ctx.fillText(game.score, gameView.dimX/2, 60);
+        gameView.ctx.strokeText(game.score, gameView.dimX/2, 60);
+      }
     })();
+  };
 
-      gameView.sounds.hit.play();
+  GameView.prototype.showScoreForm = function (score) {
+    var gameView = this;
+    var numTableRows = document.getElementsByTagName('tr').length;
+    $('#score-form-container').show();
+    $('#input-score').val(score);
+    $('#score-form').submit(function (e) {
+      e.preventDefault();
+      var newScoreData = $('#score-form').serializeJSON();
+      $.ajax({
+        url: '/high_scores',
+        method: 'POST',
+        data: newScoreData,
+        dataType: "JSON",
+        success: function (res) {
+          $('#input-name').empty().hide();
+          var name = res.name;
+          var score = res.score;
+
+          var $newTableData = $('<tr><td>' + name + '</td><td>' + score + '</td></tr>');
+          if (numTableRows >= 11) {
+            $('tr').last().remove();
+          }
+          $('.scoreboard').append($newTableData);
+          gameView.showRestart();
+        },
+        error: function (res) {
+          var msg = res.responseText;
+          $('body').append($('<div>').addClass('errors').text(msg));
+        }
+      });
+    });
+  };
+
+  GameView.prototype.showRestart = function () {
+    $('.restart').show();
+    var gameView = this;
+    $('.restart').on('click', function () {
+      gameView.started = false;
+      gameView.allowInput = true;
+      landingId = window.cancelAnimationFrame(landingId);
+      gameView.showLanding();
+    });
+  };
+
+  GameView.prototype.showHighScores = function (score) {
+    var gameView = this;
+    $('#scoreboard-container').show();
+    $('#score').text(score);
+
+    $.ajax({
+      url: '/high_scores',
+      success: function (res) {
+        var lowScore = parseInt(res.reverse()[0].score);
+        if (score > lowScore) {
+          gameView.showScoreForm(score);
+        } else {
+          gameView.showRestart();
+        }
+      }
+     });
   };
 
   GameView.prototype.showLanding = function () {
+    $('#scoreboard-container').hide();
+    $('.restart').hide();
+    $('.landing').show();
     var birdy = { img: this.images.birdies,
                   posX: 175,
                   posY: 215,
@@ -68,6 +149,7 @@
                  vel: 2,
                  poo: this.sounds.poo
                };
+    this.started = false;
     var view = this;
     var sky = this.images.sky;
     var ground = this.images.ground;
@@ -102,17 +184,19 @@
   };
 
   GameView.prototype.start = function () {
+    $('.landing').hide();
     var groundX = 0;
     var skyX = 0;
     var gameView = this;
+    var game = new CrappyBird.Game(this.dimX, this.dimY);
+    this.birdy = game.birdy;
     var ctx = this.ctx;
     var sky = this.images.sky;
     var ground = this.images.ground;
     var groundHeight = this.dimY - 100;
     (function renderGame() {
-      if (gameView.game.gameOver) {
-        window.cancelAnimationFrame(gameId);
-        gameView.handleGameOver(skyX, groundX);
+      if (game.over) {
+        gameView.handleGameOver(skyX, groundX, game);
       } else {
         gameId = window.requestAnimationFrame(renderGame);
         ctx.clearRect(0,0, gameView.dimX, gameView.dimY);
@@ -121,16 +205,16 @@
         ctx.drawImage(sky, 966-Math.abs(skyX), 0, 966, gameView.dimY);
         ctx.drawImage(ground, groundX, groundHeight);
         ctx.drawImage(ground, gameView.dimX - Math.abs(groundX), groundHeight);
-        gameView.game.step();
-        gameView.game.draw(ctx);
+        game.step();
+        game.draw(ctx);
 
         ctx.font = '28px "Press Start 2P"';
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
         ctx.lineWidth = 2;
         ctx.strokeStyle = "#3e2500";
-        ctx.fillText(gameView.game.score, gameView.dimX/2, 60);
-        ctx.strokeText(gameView.game.score, gameView.dimX/2, 60);
+        ctx.fillText(game.score, gameView.dimX/2, 60);
+        ctx.strokeText(game.score, gameView.dimX/2, 60);
 
         if (Math.abs(skyX) > 966) {
           skyX = 0;

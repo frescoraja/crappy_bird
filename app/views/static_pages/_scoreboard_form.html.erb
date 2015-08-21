@@ -1,0 +1,9 @@
+<div id="score-form-container">
+  <form action="<%= high_scores_url %>" method="post" id="score-form">
+    <input type="hidden"
+           name="authenticity_token"
+           value="<%= form_authenticity_token %>">
+    <input type="text" name="high_score[name]" placeholder="enter name here" id="input-name">
+    <input type="hidden" name="high_score[score]" id="input-score">
+  </form>
+</div>
