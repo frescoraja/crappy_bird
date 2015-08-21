@@ -54,7 +54,7 @@
           gameView.showHighScores(game.score);
         }, 500);
       } else {
-        deadId = window.requestAnimationFrame(renderDead);
+        deadId = window.requestAnimFrame(renderDead);
         gameView.ctx.clearRect(0, 0, gameView.dimX, gameView.dimY);
         gameView.ctx.drawImage(sky, skyX, 0, 966, gameView.dimY);
         gameView.ctx.drawImage(sky, 966-Math.abs(skyX), 0, 966, gameView.dimY);
@@ -174,7 +174,7 @@
     var ground = this.images.ground;
     var birdyImg = birdy.img[3];
     (function renderLanding () {
-      landingId = window.requestAnimationFrame(renderLanding);
+      landingId = window.requestAnimFrame(renderLanding);
       view.ctx.clearRect(0, 0, view.dimX, view.dimY);
       view.ctx.drawImage(sky, 0, 0, 966, view.dimY);
       view.ctx.drawImage(ground, 0, view.dimY - 100);
@@ -217,7 +217,7 @@
       if (game.over) {
         gameView.handleGameOver(skyX, groundX, game);
       } else {
-        gameId = window.requestAnimationFrame(renderGame);
+        gameId = window.requestAnimFrame(renderGame);
         ctx.clearRect(0,0, gameView.dimX, gameView.dimY);
 
         ctx.drawImage(sky, skyX, 0, 966, gameView.dimY);
@@ -246,4 +246,15 @@
       }
     })();
   };
+
+  window.requestAnimFrame = (function(){
+        return  window.requestAnimationFrame       ||
+            window.webkitRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
+            window.oRequestAnimationFrame ||
+            window.mozRequestAnimationFrame    ||
+            function( callback ){
+                window.setTimeout(callback, 1000 / 1000);
+            };
+    })();
 })();
