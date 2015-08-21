@@ -78,19 +78,19 @@
     var numTableRows = document.getElementsByTagName('tr').length;
     $('#score-form-container').show();
     $('#input-score').val(score);
-    $('#input-name').show();
     $('#score-form').submit(function (e) {
       e.preventDefault();
       var newScoreData = $('#score-form').serializeJSON();
       $.ajax({
+        type: 'POST',
         url: '/high_scores',
-        method: 'POST',
+        dataType: 'json',
         data: newScoreData,
-        dataType: "JSON",
         success: function (res) {
           $('.errors').empty();
-          $('#input-name').val('').hide();
+          $('#input-name').val('');
           $('#input-score').val('');
+          $('#score-form-container').hide();
           var name = res.name;
           var score = res.score;
 
@@ -113,6 +113,7 @@
     $('.restart').show();
     var gameView = this;
     $('.restart').on('click', function () {
+      $('#score-form').off();
       gameView.started = false;
       gameView.allowInput = true;
       landingId = window.cancelAnimationFrame(landingId);
@@ -128,7 +129,13 @@
     $.ajax({
       url: '/high_scores',
       success: function (res) {
-        if (res) {
+        if (res.length === 0) {
+          if (score > 0) {
+            gameView.showScoreForm(score);
+          } else {
+            gameView.showRestart();
+          }
+        } else {
           res.forEach(function (highScore) {
             var name = highScore.name;
             var score = highScore.score;
@@ -137,13 +144,11 @@
             $('.scoreboard').append($tableRow);
           });
           var lowScore = parseInt(res.reverse()[0].score);
-          if (score >= lowScore) {
+          if (score >= lowScore || (res.length < 10 && score > 0)) {
             gameView.showScoreForm(score);
           } else {
-          gameView.showRestart();
+            gameView.showRestart();
           }
-        } else {
-          gameView.showScoreForm(score);
         }
       }
      });
