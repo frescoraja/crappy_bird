@@ -81,6 +81,7 @@
     $('#score-form').submit(function (e) {
       e.preventDefault();
       var newScoreData = $('#score-form').serializeJSON();
+      $('#input-name').prop('disabled', true);
       $.ajax({
         type: 'POST',
         url: '/high_scores',
@@ -104,6 +105,7 @@
         error: function (res) {
           var msg = res.responseText;
           $('.errors').text(msg);
+          $("#input-name").prop("disabled", false);
         }
       });
     });
@@ -132,6 +134,7 @@
         if (res.length === 0) {
           if (score > 0) {
             gameView.showScoreForm(score);
+            $("#input-name").prop("disabled", false);
           } else {
             gameView.showRestart();
           }

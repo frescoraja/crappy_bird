@@ -14,11 +14,15 @@
  *= require_self
  */
 
+ html {
+   overflow-y: hidden;
+ }
+
 .bg-image {
    background: url('clouds.png') no-repeat center center fixed;
    background-size: cover;
    background-position: bottom center;
-   position: absolute;
+   position: fixed;
    top: 0;
    bottom: 0;
    left: 0;
@@ -30,8 +34,7 @@
   height: 900px;
   width: 500px;
   left: 50%;
-  top: 50%;
-  margin-top: -450px;
+  top: 50px;
   margin-left: -250px;
   background-image: url('phone.png');
   background-size: 100%;
@@ -43,8 +46,7 @@
   width: 432px;
   height: 644px;
   left: 50%;
-  top: 50%;
-  margin-top: -372px;
+  top: 127px;
   margin-left: -217px;
 }
 
@@ -140,7 +142,7 @@ td {
   text-align: left;
   width: 40%;
   left: 30%;
-  bottom: 33%;
+  bottom: 20%;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 10px;
