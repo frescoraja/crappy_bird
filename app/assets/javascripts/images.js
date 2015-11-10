@@ -7,7 +7,7 @@
     this.landing = new Image();
     this.landing.src = "assets/landing.png";
     this.sky = new Image();
-    this.sky.src = "assets/sky.png";
+    this.sky.src = "assets/sky.gif";
     this.birdy0 = new Image();
     this.birdy1 = new Image();
     this.birdy2 = new Image();
@@ -27,7 +27,7 @@
                     this.birdy4,
                     this.birdy5];
     this.ground = new Image();
-    this.ground.src = "assets/ground.png";
+    this.ground.src = "assets/ground.gif";
     this.pipeTop = new Image();
     this.pipeTop.src = "assets/pipetop.png";
     this.pipeBottom = new Image();
