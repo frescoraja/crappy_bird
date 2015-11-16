@@ -30,6 +30,14 @@
       }
     });
 
+    window.click(function (event) {
+      if (gameView.allowInput) {
+        if (gameView.started) {
+          gameView.birdy.fly();
+        }
+      }
+    });
+
     $('.press-start').click(function () {
       window.cancelAnimationFrame(landingId);
       gameView.started = true;
