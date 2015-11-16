@@ -16,7 +16,10 @@
   };
 
   GameView.prototype.bindHandlers = function () {
-    var gameView = this;
+    var gameView = this,
+        $startBtn = $('.press-start'),
+        $canvas = $('#game-canvas');
+
     key('space', function (event) {
       event.preventDefault();
       if (gameView.allowInput) {
@@ -30,7 +33,7 @@
       }
     });
 
-    window.click(function (event) {
+    $canvas.mousedown(function (event) {
       if (gameView.allowInput) {
         if (gameView.started) {
           gameView.birdy.fly();
@@ -38,7 +41,7 @@
       }
     });
 
-    $('.press-start').click(function () {
+    $startBtn.click(function () {
       window.cancelAnimationFrame(landingId);
       gameView.started = true;
       gameView.start();
