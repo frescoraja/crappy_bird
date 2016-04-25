@@ -235,10 +235,10 @@
         gameId = window.requestAnimationFrame(renderGame);
         ctx.clearRect(0,0, gameView.dimX, gameView.dimY);
 
-        ctx.drawImage(sky, skyX, 0, 966, gameView.dimY);
-        ctx.drawImage(sky, 966-Math.abs(skyX), 0, 966, gameView.dimY);
-        ctx.drawImage(ground, groundX, groundHeight);
-        ctx.drawImage(ground, gameView.dimX - Math.abs(groundX), groundHeight);
+        //ctx.drawImage(sky, skyX, 0, 966, gameView.dimY);
+        //ctx.drawImage(sky, 966-Math.abs(skyX), 0, 966, gameView.dimY);
+        //ctx.drawImage(ground, groundX, groundHeight);
+        //ctx.drawImage(ground, gameView.dimX - Math.abs(groundX), groundHeight);
         game.step();
         game.draw(ctx);
 
@@ -250,14 +250,14 @@
         ctx.fillText(game.score, gameView.dimX/2, 60);
         ctx.strokeText(game.score, gameView.dimX/2, 60);
 
-        if (Math.abs(skyX) > 966) {
-          skyX = 0;
-        }
-        if (Math.abs(groundX) > ground.width) {
-          groundX = 0;
-        }
-        groundX -= 3;
-        skyX -= 0.75;
+        //if (Math.abs(skyX) > 966) {
+          //skyX = 0;
+        //}
+        //if (Math.abs(groundX) > ground.width) {
+          //groundX = 0;
+        //}
+        //groundX -= 3;
+        //skyX -= 0.75;
       }
     })();
   };

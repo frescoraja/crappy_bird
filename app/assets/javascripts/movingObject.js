@@ -4,8 +4,9 @@
   }
 
   var MovingObject = CrappyBird.MovingObject = function(options) {
-    this.width = options.width;
-    this.height = options.height;
+    this.image = options.image;
+    this.width = options.width || this.image.width;
+    this.height = options.height || this.image.height;
     this.pos = options.pos || [0, 0];
     this.vel = options.vel || [0, 0];
     this.acc = options.acc || [0, 0];
@@ -19,7 +20,7 @@
     this.vel[1] += this.acc[1];
   };
 
-  MovingObject.prototype.draw = function(img) {
-    this.ctx.drawImage(img, this.pos[0], this.pos[1], this.width, this.height);
+  MovingObject.prototype.draw = function() {
+    this.ctx.drawImage(this.image, this.pos[0], this.pos[1], this.width, this.height);
   };
 })();

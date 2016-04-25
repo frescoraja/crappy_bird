@@ -6,7 +6,6 @@
   var Birdy2 = CrappyBird.Birdy2 = function(options) {
     CrappyBird.MovingObject.call(this, options);
     this.images = new CrappyBird.Images().birdies;
-    this.image = this.images[4];
   }
   
   CrappyBird.Utils.inherits(Birdy2, CrappyBird.MovingObject);
@@ -28,6 +27,6 @@
       this.image = this.images[0];
     }
 
-    CrappyBird.MovingObject.prototype.draw.call(this, this.image);
+    CrappyBird.MovingObject.prototype.draw.call(this);
   }
 })();

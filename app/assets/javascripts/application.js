@@ -20,6 +20,9 @@
 //= require movingObject
 //= require birdy
 //= require birdy2
+//= require environment
+//= require sky
+//= require ground
 //= require game
 //= require gameview
 //= require obstacle
