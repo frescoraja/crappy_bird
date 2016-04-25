@@ -19,17 +19,3 @@
     this.ctx.drawImage(this.image, posX, posY);
   };
 })();
-
-
-
-        //ctx.drawImage(ground, groundX, groundHeight);
-        //ctx.drawImage(ground, gameView.dimX - Math.abs(groundX), groundHeight);
-        //
-        //if (Math.abs(skyX) > 966) {
-          //skyX = 0;
-        //}
-        //if (Math.abs(groundX) > ground.width) {
-          //groundX = 0;
-        //}
-        //groundX -= 3;
-        //skyX -= 0.75;
