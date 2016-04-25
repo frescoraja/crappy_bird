@@ -23,9 +23,14 @@
     var canvas = document.getElementById('game-canvas');
     var x = 432,
         y = 644;
-    canvas.height = y;
     canvas.width = x;
+    canvas.height = y;
     var ctx = canvas.getContext('2d');
+    var options = {
+      ctx: ctx,
+      width: x,
+      height: y
+    };
     var gameView = new CrappyBird.GameView(ctx);
   });
 </script>

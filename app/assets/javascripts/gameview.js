@@ -222,10 +222,10 @@
     var groundX = 0;
     var skyX = 0;
     var gameView = this;
-    var game = new CrappyBird.Game(this.dimX, this.dimY);
-    this.birdy = game.birdy;
     var ctx = this.ctx;
     var sky = this.images.sky;
+    var game = new CrappyBird.Game(ctx);
+    this.birdy = game.birdy;
     var ground = this.images.ground;
     var groundHeight = this.dimY - 100;
     (function renderGame() {

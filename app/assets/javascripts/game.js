@@ -2,10 +2,16 @@
   if (typeof CrappyBird === 'undefined') {
     window.CrappyBird = {};
   }
+  
+  BIRDY_HEIGHT = 45;
+  BIRDY_WIDTH = 50;
+  BIRDY_VEL = [0, 10];
+  BIRDY_ACC = [0, 0.8];
+  
+  GROUND_HEIGHT = 100;
 
-  var Game = CrappyBird.Game = function (dimX, dimY) {
-    this.dimX = dimX;
-    this.dimY = dimY;
+  var Game = CrappyBird.Game = function (ctx) {
+    this.ctx = ctx;
     this.birdy = this.addBirdy();
     this.obstacles = [];
     this.currentObstacle = null;
@@ -16,10 +22,16 @@
   };
 
   Game.prototype.addBirdy = function () {
-    var birdy = new CrappyBird.Birdy({
-      pos: [175, 215],
-      game: this
-    });
+    var startX = (this.ctx.canvas.width / 2) - (BIRDY_WIDTH / 2), 
+        startY = (this.ctx.canvas.height / 2) - (BIRDY_HEIGHT / 2),
+        birdy = new CrappyBird.Birdy2({
+                    pos: [startX, startY],
+                    vel: BIRDY_VEL,
+                    acc: BIRDY_ACC,
+                    width: BIRDY_WIDTH,
+                    height: BIRDY_HEIGHT,
+                    ctx: this.ctx
+                });
     return birdy;
   };
 

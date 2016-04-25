@@ -16,7 +16,10 @@
 //= require raf
 //= require keymaster
 //= require images
+//= require utils
+//= require movingObject
 //= require birdy
+//= require birdy2
 //= require game
 //= require gameview
 //= require obstacle
