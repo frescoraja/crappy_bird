@@ -225,6 +225,7 @@
     this.birdy = game.birdy;
     (function renderGame() {
       if (game.over) {
+        var skyX = game.sky.pos[0];
         gameView.handleGameOver(skyX, groundX, game);
       } else {
         gameId = window.requestAnimationFrame(renderGame);

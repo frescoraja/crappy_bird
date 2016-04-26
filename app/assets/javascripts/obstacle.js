@@ -3,24 +3,23 @@
     window.CrappyBird = {};
   }
 
-  var Obstacle = CrappyBird.Obstacle = function (game, startX) {
-    this.game = game;
-    this.pipes = new CrappyBird.Images().pipes;
+  var Obstacle = CrappyBird.Obstacle = function (options) {
+    CrappyBird.MovingObject.call(this, options);
+    this.game = options.game;
+    this.pipes = options.images;
+    this.gap = options.gap;
     var heights = this.generateHeights();
     this.bottomHeight = heights[0];
     this.topHeight = heights[1];
-    this.width = 80;
-    this.pos = startX || this.game.dimX;
     this.topOpening = this.topHeight;
-    this.bottomOpening = this.topHeight + 130;
-    this.point = new CrappyBird.Sounds().point;
-    this.gavePoint = false;
+    this.bottomOpening = this.topHeight + this.gap;
   };
 
+  CrappyBird.Utils.inherits(Obstacle, CrappyBird.MovingObject);
+
   Obstacle.prototype.generateHeights = function () {
-    var gapSize = 130;
-    var aboveGround = this.game.dimY - 100;
-    var pipeAbleSpace = aboveGround - gapSize;
+    var aboveGround = this.ctx.canvas.height - this.game.ground.height;
+    var pipeAbleSpace = aboveGround - this.gap;
     var minHeight =  pipeAbleSpace * 0.1;
     var maxHeight = pipeAbleSpace * 0.9;
 
@@ -28,36 +27,15 @@
     var bottomHeight = pipeAbleSpace - topHeight;
     return [bottomHeight, topHeight];
   };
-
-  Obstacle.prototype.draw = function (ctx) {
-    ctx.drawImage(this.pipes[0],
-                  this.pos, this.topHeight - this.game.dimY,
-                  this.width, this.game.dimY);
-    ctx.drawImage(this.pipes[1],
+  
+  Obstacle.prototype.draw = function () {
+    this.ctx.drawImage(this.pipes[0],
+                  this.pos[0], this.topHeight - this.ctx.canvas.height,
+                  this.width, this.ctx.canvas.height);
+    this.ctx.drawImage(this.pipes[1],
                   0, 0,
-                  this.pipes[1].width, (this.bottomHeight / this.game.dimY) * this.pipes[1].height,
-                  this.pos, this.game.dimY - 100 - this.bottomHeight,
+                  this.pipes[1].width, (this.bottomHeight / this.ctx.canvas.height) * this.pipes[1].height,
+                  this.pos[0], this.ctx.canvas.height - 100 - this.bottomHeight,
                   this.width, this.bottomHeight);
-  };
-
-  Obstacle.prototype.move = function () {
-    if (this.pos + this.width < 0) {
-      this.remove();
-    }
-    if (this.pos >= 90 && this.pos < 92) {
-      this.game.addObstacle();
-    }
-    this.pos += -3;
-    if (this.pos + this.width <= this.game.birdy.pos[0]) {
-      if (!this.gavePoint) {
-        this.gavePoint = true;
-        this.game.score += 1;
-        this.point.play();
-      }
-    }
-  };
-
-  Obstacle.prototype.remove = function () {
-    this.game.remove(this);
   };
 })();
