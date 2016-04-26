@@ -212,30 +212,33 @@
     })();
   };
 
+  GameView.prototype.renderScore = function (score) {
+    this.ctx.fillText(score, this.dimX/2, 60);
+    this.ctx.strokeText(score, this.dimX/2, 60);
+  };
+
   GameView.prototype.start = function () {
     $('.landing').hide();
     this.game = new CrappyBird.Game(this.ctx);
     this.birdy = this.game.birdy; 
     var gameView = this,
+        ctx = this.ctx,
         game = this.game;
 
     (function renderGame() {
+      gameView.gameId = window.requestAnimationFrame(renderGame);
+      ctx.clearRect(0, 0, gameView.dimX, gameView.dimY);
+      game.step();
+      game.draw();
+      gameView.renderScore(game.score);
+
       if (game.over) {
         var skyX = game.sky.pos[0],
             groundX = game.ground.pos[0];
         gameView.allowInput = false;
         window.cancelAnimationFrame(gameView.gameId); 
-        //gameView.handleGameOver(skyX, groundX, game);
-      } else {
-        gameView.gameId = window.requestAnimationFrame(renderGame);
-        gameView.ctx.clearRect(0,0, gameView.dimX, gameView.dimY);
-
-        game.step();
-        game.draw();
-        
-        gameView.ctx.fillText(game.score, gameView.dimX/2, 60);
-        gameView.ctx.strokeText(game.score, gameView.dimX/2, 60);
-      }
+        gameView.handleGameOver(skyX, groundX, game);
+      } 
     })();
   };
 })();

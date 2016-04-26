@@ -8,6 +8,8 @@
     this.landing.src = "assets/landing.png";
     this.sky = new Image();
     this.sky.src = "assets/sky.gif";
+    this.sky.height = 644;
+    this.sky.width = 966;
     this.birdy0 = new Image();
     this.birdy1 = new Image();
     this.birdy2 = new Image();
@@ -28,6 +30,8 @@
                     this.birdy5];
     this.ground = new Image();
     this.ground.src = "assets/ground.gif";
+    this.ground.height = 100;
+    this.ground.width = 432;
     this.pipeTop = new Image();
     this.pipeTop.src = "assets/pipetop.png";
     this.pipeBottom = new Image();
