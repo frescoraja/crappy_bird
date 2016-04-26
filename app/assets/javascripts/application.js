@@ -19,11 +19,9 @@
 //= require utils
 //= require movingObject
 //= require birdy
-//= require birdy2
 //= require sky
 //= require ground
 //= require game
 //= require gameview
 //= require obstacle
-//= require turbolinks
 //= require_tree .

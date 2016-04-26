@@ -33,7 +33,7 @@
   Game.prototype.addBirdy = function () {
     var startX = (this.ctx.canvas.width / 2) - (BIRDY_WIDTH / 2), 
         startY = (this.ctx.canvas.height / 3) - (BIRDY_HEIGHT / 2),
-        birdy = new CrappyBird.Birdy2({
+        birdy = new CrappyBird.Birdy({
           pos: [startX, startY],
           vel: BIRDY_VEL,
           acc: BIRDY_ACC,

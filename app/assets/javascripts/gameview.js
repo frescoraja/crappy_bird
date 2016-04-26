@@ -26,7 +26,7 @@
         if (gameView.started) {
           gameView.game.flyBird();
         } else {
-          window.cancelAnimationFrame(landingId);
+          window.cancelAnimationFrame(gameView.landingId);
           gameView.started = true;
           gameView.start();
         }
@@ -42,7 +42,7 @@
     });
 
     $startBtn.click(function () {
-      window.cancelAnimationFrame(landingId);
+      window.cancelAnimationFrame(gameView.landingId);
       gameView.started = true;
       gameView.start();
     });
@@ -50,7 +50,6 @@
 
   GameView.prototype.handleGameOver = function (skyX, groundX, game) {
     var gameView = this;
-    window.cancelAnimationFrame(gameView.gameId);
     this.allowInput = false;
     this.sounds.die.play();
     var sky = this.images.sky;
@@ -61,12 +60,12 @@
     (function renderDead () {
       if (birdy.vel === 0) {
         gameView.sounds.hit.play();
-        window.cancelAnimationFrame(deadId);
+        window.cancelAnimationFrame(gameView.deadId);
         setTimeout(function () {
           gameView.showHighScores(game.score);
         }, 500);
       } else {
-        deadId = window.requestAnimationFrame(renderDead);
+        gameView.deadId = window.requestAnimationFrame(renderDead);
         gameView.ctx.clearRect(0, 0, gameView.dimX, gameView.dimY);
         gameView.ctx.drawImage(sky, skyX, 0, 966, gameView.dimY);
         gameView.ctx.drawImage(sky, 966-Math.abs(skyX), 0, 966, gameView.dimY);
@@ -125,7 +124,7 @@
       $('#score-form').off();
       gameView.started = false;
       gameView.allowInput = true;
-      landingId = window.cancelAnimationFrame(landingId);
+      gameView.landingId = window.cancelAnimationFrame(gameView.landingId);
       gameView.showLanding();
     });
   };
@@ -168,10 +167,12 @@
     $('#scoreboard-container').hide();
     $('.restart').hide();
     $('.landing').show();
-    var birdy = { img: this.images.birdies,
-                  posX: 175,
-                  posY: 215,
-                  vel: 1};
+    var birdy = { 
+          img: this.images.birdies,
+          posX: 175,
+          posY: 215,
+          vel: 1
+        };
     var dudu = { img: this.images.dudu,
                  posX: 165,
                  posY: 230,
@@ -179,12 +180,13 @@
                  poo: this.sounds.poo
                };
     this.started = false;
+    var gameView = this;
     var view = this;
     var sky = this.images.sky;
     var ground = this.images.ground;
     var birdyImg = birdy.img[3];
     (function renderLanding () {
-      landingId = window.requestAnimationFrame(renderLanding);
+      gameView.landingId = window.requestAnimationFrame(renderLanding);
       view.ctx.clearRect(0, 0, view.dimX, view.dimY);
       view.ctx.drawImage(sky, 0, 0, 966, view.dimY);
       view.ctx.drawImage(ground, 0, view.dimY - 100);
