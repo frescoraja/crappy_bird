@@ -21,10 +21,10 @@
   };
 
   Birdy2.prototype.draw = function () {
-    if (this.falling()) {
-      this.image = this.images[4];
-    } else if (this.dead) {
+    if (this.dead) {
       this.image = this.images[5];
+    } else if (this.falling()) {
+      this.image = this.images[4];
     } else {
       this.image = this.images[0];
     }

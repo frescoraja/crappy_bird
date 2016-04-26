@@ -24,7 +24,7 @@
       event.preventDefault();
       if (gameView.allowInput) {
         if (gameView.started) {
-          gameView.birdy.fly();
+          gameView.game.flyBird();
         } else {
           window.cancelAnimationFrame(landingId);
           gameView.started = true;
@@ -36,7 +36,7 @@
     $canvas.mousedown(function (event) {
       if (gameView.allowInput) {
         if (gameView.started) {
-          gameView.birdy.fly();
+          gameView.game.fly();
         }
       }
     });
@@ -50,7 +50,7 @@
 
   GameView.prototype.handleGameOver = function (skyX, groundX, game) {
     var gameView = this;
-    window.cancelAnimationFrame(gameId);
+    window.cancelAnimationFrame(gameView.gameId);
     this.allowInput = false;
     this.sounds.die.play();
     var sky = this.images.sky;
@@ -73,12 +73,7 @@
         gameView.ctx.drawImage(ground, groundX, groundHeight);
         gameView.ctx.drawImage(ground, gameView.dimX - Math.abs(groundX), groundHeight);
         birdy.move();
-        game.draw(gameView.ctx);
-        gameView.ctx.font = '28px "Press Start 2P"';
-        gameView.ctx.fillStyle = "white";
-        gameView.ctx.textAlign = "center";
-        gameView.ctx.lineWidth = 2;
-        gameView.ctx.strokeStyle = "#3e2500";
+        game.draw();
         gameView.ctx.fillText(game.score, gameView.dimX/2, 60);
         gameView.ctx.strokeText(game.score, gameView.dimX/2, 60);
       }
@@ -219,28 +214,27 @@
 
   GameView.prototype.start = function () {
     $('.landing').hide();
-    var gameView = this;
-    var ctx = this.ctx;
-    var game = new CrappyBird.Game(ctx);
-    this.birdy = game.birdy;
+    this.game = new CrappyBird.Game(this.ctx);
+    this.birdy = this.game.birdy; 
+    var gameView = this,
+        game = this.game;
+
     (function renderGame() {
       if (game.over) {
-        var skyX = game.sky.pos[0];
-        gameView.handleGameOver(skyX, groundX, game);
+        var skyX = game.sky.pos[0],
+            groundX = game.ground.pos[0];
+        gameView.allowInput = false;
+        window.cancelAnimationFrame(gameView.gameId); 
+        //gameView.handleGameOver(skyX, groundX, game);
       } else {
-        gameId = window.requestAnimationFrame(renderGame);
-        ctx.clearRect(0,0, gameView.dimX, gameView.dimY);
+        gameView.gameId = window.requestAnimationFrame(renderGame);
+        gameView.ctx.clearRect(0,0, gameView.dimX, gameView.dimY);
 
         game.step();
-        game.draw(ctx);
-
-        ctx.font = '28px "Press Start 2P"';
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "#3e2500";
-        ctx.fillText(game.score, gameView.dimX/2, 60);
-        ctx.strokeText(game.score, gameView.dimX/2, 60);
+        game.draw();
+        
+        gameView.ctx.fillText(game.score, gameView.dimX/2, 60);
+        gameView.ctx.strokeText(game.score, gameView.dimX/2, 60);
       }
     })();
   };

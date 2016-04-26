@@ -26,6 +26,13 @@
     canvas.width = x;
     canvas.height = y;
     var ctx = canvas.getContext('2d');
+
+    ctx.font = '28px "Press Start 2P"';
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#3e2500";
+
     var options = {
       ctx: ctx,
       width: x,

@@ -5,9 +5,9 @@
   
   BIRDY_HEIGHT      = 45;
   BIRDY_WIDTH       = 50;
-  BIRDY_VEL         = [0, 1];
-  BIRDY_FLY_VEL     = -5;
-  BIRDY_ACC         = [0, .333];
+  BIRDY_VEL         = [0, 0];
+  BIRDY_FLY_VEL     = -10;
+  BIRDY_ACC         = [0, 0.8];
 
   SKY_VEL           = [-1, 0];
   GROUND_VEL        = [-3, 0];
@@ -131,12 +131,17 @@
     }
   };
 
-  Game.prototype.draw = function (ctx) {
+  Game.prototype.draw = function () {
     this.allObjects().forEach(function (obj) {
       obj.draw();
     });
   };
 
+  Game.prototype.flyBird = function () {
+    this.sounds.fly.play();
+    this.birdy.fly();
+  };
+  
   Game.prototype.moveObjects = function () {
     this.allObjects().forEach(function (obj) {
       obj.move();
@@ -149,9 +154,9 @@
 
   Game.prototype.step = function () {
     this.moveObjects();
-    this.checkCollision();
     this.checkCurrentObstacle();
     this.checkObstaclePosition();
+    this.checkCollision();
 
     return this;
   };
