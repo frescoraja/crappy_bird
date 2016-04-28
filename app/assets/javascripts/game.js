@@ -3,11 +3,20 @@
     window.CrappyBird = {};
   }
   
+  // tweak these constants to adjust difficulty of the game
+  // - make birdy larger, make gap between obstacles smaller,
+  //   increase gravity, or increase flying velocity
+  // - obstacle velocity is tied to ground velocity, the faster
+  //   it moves, the harder the game!
+  
   BIRDY_HEIGHT      = 45;
   BIRDY_WIDTH       = 50;
   BIRDY_VEL         = [0, 0];
   BIRDY_FLY_VEL     = -10;
   BIRDY_ACC         = [0, 0.8];
+
+  DUDU_VEL          = [0, 0];
+  DUDU_ACC          = [0, 0.2];
 
   SKY_VEL           = [-1, 0];
   GROUND_VEL        = [-3, 0];
@@ -17,8 +26,12 @@
   PIPE_GAP_SIZE     = 130;
   PIPE_WIDTH        = 80;
   
-  var Game = CrappyBird.Game = function (ctx) {
-    this.ctx             = ctx;
+  var Game = CrappyBird.Game = function (options) {
+    this.birdyVel = options.birdyVel || BIRDY_VEL;
+    this.groundVel = options.groundVel || GROUND_VEL;
+    this.skyVel = options.skyVel || SKY_VEL;
+    this.dudu = options.dudu || [];
+    this.ctx             = options.ctx;
     this.images          = new CrappyBird.Images();
     this.sounds          = new CrappyBird.Sounds();
     this.birdy           = this.addBirdy();
@@ -35,12 +48,12 @@
         startY = (this.ctx.canvas.height / 3) - (BIRDY_HEIGHT / 2),
         birdy = new CrappyBird.Birdy({
           pos: [startX, startY],
-          vel: BIRDY_VEL,
+          vel: this.birdyVel,
           acc: BIRDY_ACC,
           fly_vel: BIRDY_FLY_VEL,
           width: BIRDY_WIDTH,
           height: BIRDY_HEIGHT,
-          image: this.images.birdies[4],
+          images: this.images.birdies,
           ctx: this.ctx
         });
     return birdy;
@@ -48,7 +61,7 @@
 
   Game.prototype.addGround = function() {
     var options = {
-      vel: GROUND_VEL,
+      vel: this.groundVel,
       image: this.images.ground,
       ctx: this.ctx
     };
@@ -58,7 +71,7 @@
   
   Game.prototype.addSky = function() {
     var options = {
-      vel: SKY_VEL,
+      vel: this.skyVel,
       image: this.images.sky,
       ctx: this.ctx
     };
@@ -69,7 +82,7 @@
   Game.prototype.addObstacle = function (startX) {
     var options = {
           pos: [startX, 0],
-          vel: GROUND_VEL,
+          vel: this.groundVel,
           gap: PIPE_GAP_SIZE,
           height: "N/A",
           width: PIPE_WIDTH,
@@ -84,7 +97,7 @@
   };
 
   Game.prototype.allObjects = function () {
-    return [].concat(this.sky, this.ground, this.obstacles, this.birdy);
+    return [].concat(this.sky, this.ground, this.obstacles, this.birdy, this.dudu);
   };
 
   Game.prototype.awardPoint = function () {
@@ -93,7 +106,7 @@
   };
 
   Game.prototype.birdyHitGround = function() {
-    return (this.birdy.pos[1] + this.birdy.height) >= (this.ctx.canvas.height - this.ground.height);
+    return this.birdy.hitGround(this.ground.height);
   };
   
   Game.prototype.birdyHitObstacle = function(obstacle) {
@@ -140,6 +153,10 @@
   Game.prototype.flyBird = function () {
     this.sounds.fly.play();
     this.birdy.fly();
+  };
+
+  Game.prototype.makeDudu = function() { 
+    if (this.dudu
   };
   
   Game.prototype.moveObjects = function () {

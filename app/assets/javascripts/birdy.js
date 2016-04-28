@@ -19,6 +19,10 @@
   Birdy.prototype.falling = function() {
     return (this.vel[1] > 0);
   };
+  
+  Birdy.prototype.hitGround = function(groundHeight) {
+    return this.pos[1] + this.height >= (this.ctx.canvas.height - groundHeight);
+  };
 
   Birdy.prototype.draw = function () {
     if (this.dead) {

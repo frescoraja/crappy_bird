@@ -4,11 +4,7 @@
   }
 
   var GameView = CrappyBird.GameView = function (ctx) {
-    this.images = new CrappyBird.Images();
-    this.sounds = new CrappyBird.Sounds();
     this.ctx = ctx;
-    this.dimX = ctx.canvas.width;
-    this.dimY = ctx.canvas.height;
     this.started = false;
     this.allowInput = true;
     this.showLanding();
@@ -16,65 +12,48 @@
   };
 
   GameView.prototype.bindHandlers = function () {
-    var gameView = this,
-        $startBtn = $('.press-start'),
+    var $startBtn = $('.press-start'),
         $canvas = $('#game-canvas');
 
-    key('space', function (event) {
-      event.preventDefault();
-      if (gameView.allowInput) {
-        if (gameView.started) {
-          gameView.game.flyBird();
-        } else {
-          window.cancelAnimationFrame(gameView.landingId);
-          gameView.started = true;
-          gameView.start();
-        }
-      }
-    });
+    key('space', this.flyBirdOrStart.bind(this));
 
-    $canvas.mousedown(function (event) {
-      if (gameView.allowInput) {
-        if (gameView.started) {
-          gameView.game.fly();
-        }
-      }
-    });
+    $canvas.click(this.flyBirdOrStart.bind(this));
 
-    $startBtn.click(function () {
-      window.cancelAnimationFrame(gameView.landingId);
-      gameView.started = true;
-      gameView.start();
-    });
+    $startBtn.click(this.startGame.bind(this));
   };
 
-  GameView.prototype.handleGameOver = function (skyX, groundX, game) {
-    var gameView = this;
+  GameView.prototype.flyBirdOrStart = function() {
+    if (this.allowInput) {
+      if (this.started) {
+        this.game.flyBird();
+      } else {
+        this.startGame();
+      }
+    }
+  };
+
+  GameView.prototype.startGame = function() {
+    window.cancelAnimationFrame(this.landingId);
+    this.started = true;
+    this.start();
+  };
+
+  GameView.prototype.handleGameOver = function () {
     this.allowInput = false;
     this.sounds.die.play();
-    var sky = this.images.sky;
-    var ground = this.images.ground;
-    var groundHeight = this.dimY - 100;
-    var birdy = this.birdy;
-    birdy.image = birdy.images[5];
+    var gameView = this,
+        game = this.game,
+        birdy = this.game.birdy;
+    bird.vel = [0,.3];
     (function renderDead () {
-      if (birdy.vel === 0) {
-        gameView.sounds.hit.play();
+      if (birdy.hitGround(game.ground.height)) {
+        game.sounds.hit.play();
         window.cancelAnimationFrame(gameView.deadId);
-        setTimeout(function () {
-          gameView.showHighScores(game.score);
-        }, 500);
+        setTimeout(gameView.showHighScores.bind(this), 750);
       } else {
         gameView.deadId = window.requestAnimationFrame(renderDead);
-        gameView.ctx.clearRect(0, 0, gameView.dimX, gameView.dimY);
-        gameView.ctx.drawImage(sky, skyX, 0, 966, gameView.dimY);
-        gameView.ctx.drawImage(sky, 966-Math.abs(skyX), 0, 966, gameView.dimY);
-        gameView.ctx.drawImage(ground, groundX, groundHeight);
-        gameView.ctx.drawImage(ground, gameView.dimX - Math.abs(groundX), groundHeight);
-        birdy.move();
         game.draw();
-        gameView.ctx.fillText(game.score, gameView.dimX/2, 60);
-        gameView.ctx.strokeText(game.score, gameView.dimX/2, 60);
+        gameView.renderScore(game.score);
       }
     })();
   };
@@ -167,31 +146,30 @@
     $('#scoreboard-container').hide();
     $('.restart').hide();
     $('.landing').show();
-    var birdy = { 
-          img: this.images.birdies,
-          posX: 175,
-          posY: 215,
-          vel: 1
-        };
     var dudu = { img: this.images.dudu,
                  posX: 165,
                  posY: 230,
                  vel: 2,
                  poo: this.sounds.poo
                };
-    this.started = false;
-    var gameView = this;
+    var options = {
+      birdyVel: [0, 1],
+      skyVel: [-0.5, 0],
+      groundVel: [-1, 0],
+      dudu: dudu,
+      ctx: this.ctx
+    };
     var view = this;
-    var sky = this.images.sky;
+    var ctx = this.ctx;
     var ground = this.images.ground;
     var birdyImg = birdy.img[3];
+    this.game = new CrappyBird.game(options);
+    this.started = false;
     (function renderLanding () {
-      gameView.landingId = window.requestAnimationFrame(renderLanding);
-      view.ctx.clearRect(0, 0, view.dimX, view.dimY);
-      view.ctx.drawImage(sky, 0, 0, 966, view.dimY);
-      view.ctx.drawImage(ground, 0, view.dimY - 100);
-      view.ctx.drawImage(birdyImg, birdy.posX, birdy.posY, 50, 45);
-      view.ctx.drawImage(dudu.img, dudu.posX, dudu.posY, 15, 15);
+      view.landingId = window.requestAnimationFrame(renderLanding);
+      ctx.clearRect(0, 0, ctx.width, ctx.height);
+      ctx.drawImage(birdyImg, birdy.posX, birdy.posY, 50, 45);
+      ctx.drawImage(dudu.img, dudu.posX, dudu.posY, 15, 15);
 
       if (dudu.posY === birdy.posY + 15) {
         dudu.poo.play();
@@ -214,32 +192,28 @@
     })();
   };
 
-  GameView.prototype.renderScore = function (score) {
-    this.ctx.fillText(score, this.dimX/2, 60);
-    this.ctx.strokeText(score, this.dimX/2, 60);
+  GameView.prototype.renderScore = function () {
+    this.ctx.fillText(this.game.score, this.dimX/2, 60);
+    this.ctx.strokeText(this.game.score, this.dimX/2, 60);
   };
 
   GameView.prototype.start = function () {
     $('.landing').hide();
-    this.game = new CrappyBird.Game(this.ctx);
-    this.birdy = this.game.birdy; 
+    options = { ctx: this.ctx };
+    this.game = new CrappyBird.Game(options);
     var gameView = this,
         ctx = this.ctx,
         game = this.game;
 
     (function renderGame() {
       gameView.gameId = window.requestAnimationFrame(renderGame);
-      ctx.clearRect(0, 0, gameView.dimX, gameView.dimY);
-      game.step();
-      game.draw();
-      gameView.renderScore(game.score);
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      game.step().draw();
+      gameView.renderScore();
 
       if (game.over) {
-        var skyX = game.sky.pos[0],
-            groundX = game.ground.pos[0];
-        gameView.allowInput = false;
         window.cancelAnimationFrame(gameView.gameId); 
-        gameView.handleGameOver(skyX, groundX, game);
+        gameView.handleGameOver();
       } 
     })();
   };

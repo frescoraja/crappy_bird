@@ -4,7 +4,8 @@
   }
 
   var MovingObject = CrappyBird.MovingObject = function(options) {
-    this.image = options.image;
+    this.image = options.image || [];
+    this.images = options.images || [];
     this.width = options.width || this.image.width;
     this.height = options.height || this.image.height;
     this.pos = options.pos || [0, 0];
