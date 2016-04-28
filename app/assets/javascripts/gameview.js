@@ -14,8 +14,9 @@
   GameView.prototype.bindHandlers = function () {
     var $startBtn = $('.press-start'),
         $canvas = $('#game-canvas');
-
     key('space', this.flyBirdOrStart.bind(this));
+
+    key('f', this.dropBomb.bind(this));
 
     $canvas.click(this.flyBirdOrStart.bind(this));
 
@@ -32,6 +33,11 @@
     }
   };
 
+  GameView.prototype.dropBomb = function() {
+    if (!this.allowInput) return;
+    this.game.addDudu();
+  };
+
   GameView.prototype.startGame = function() {
     window.cancelAnimationFrame(this.landingId);
     this.started = true;
@@ -43,24 +49,29 @@
     var gameView = this,
         game = this.game,
         birdy = this.game.birdy;
-    bird.vel = [0,.3];
+    game.drawGameOver();
     (function renderDead () {
       if (birdy.hitGround(game.ground.height)) {
         window.cancelAnimationFrame(gameView.deadId);
-        setTimeout(gameView.showHighScores.bind(this), 750);
+        setTimeout(function() {
+          gameView.showHighScores(game.score);
+        }, 1000);
       } else {
         gameView.deadId = window.requestAnimationFrame(renderDead);
+        gameView.ctx.clearRect(0, 0, gameView.ctx.canvas.width, gameView.ctx.canvas.height);
+        game.step();
         game.draw();
+        
         gameView.renderScore(game.score);
       }
     })();
   };
 
-  GameView.prototype.showScoreForm = function (score) {
+  GameView.prototype.showScoreForm = function () {
     var gameView = this;
     var numTableRows = document.getElementsByTagName('tr').length;
     $('#score-form-container').show();
-    $('#input-score').val(score);
+    $('#input-score').val(gameView.game.score);
     $('#score-form').submit(function (e) {
       e.preventDefault();
       var newScoreData = $('#score-form').serializeJSON();
@@ -91,18 +102,6 @@
           $("#input-name").prop("disabled", false);
         }
       });
-    });
-  };
-
-  GameView.prototype.showRestart = function () {
-    $('.restart').show();
-    var gameView = this;
-    $('.restart').on('click', function () {
-      $('#score-form').off();
-      gameView.started = false;
-      gameView.allowInput = true;
-      gameView.landingId = window.cancelAnimationFrame(gameView.landingId);
-      gameView.showLanding();
     });
   };
 
@@ -145,6 +144,7 @@
     $('.restart').hide();
     $('.landing').show();
     var birdyOptions = {
+      vel: [0, -0.5],
       acc: [0, 0],
       imageIndices: [0, 3, 5],
     };
@@ -168,14 +168,15 @@
     this.started = false;
     (function renderLanding () {
       gameView.landingId = window.requestAnimationFrame(renderLanding);
-
-      if (birdy.pos[1] <= (ctx.canvas.height / 3) - (birdy.height / 2)) {
+      if (birdy.pos[1] < Math.floor((ctx.canvas.height / 3) - (birdy.height / 2))) {
+        if (birdy.vel[1] < 0 ) {
+          game.addDudu();
+        }
         birdy.vel = [0, 2];
-        game.addDudu();
-      } else if (birdy.pos[1] > (ctx.canvas.height / 3) - (birdy.height / 2) + 200) {
+      } else if (birdy.pos[1] > Math.floor((ctx.canvas.height / 3) - (birdy.height / 2) + 200)) {
         birdy.vel = [0, -2];
       }
-      
+
       ctx.clearRect(0, 0, ctx.width, ctx.height);
       game.draw();
       game.step();
@@ -183,8 +184,21 @@
   };
 
   GameView.prototype.renderScore = function () {
-    this.ctx.fillText(this.game.score, this.dimX/2, 60);
-    this.ctx.strokeText(this.game.score, this.dimX/2, 60);
+    var dimX = this.ctx.canvas.width / 2;
+    this.ctx.fillText(this.game.score, dimX, 60);
+    this.ctx.strokeText(this.game.score, dimX, 60);
+  };
+
+  GameView.prototype.showRestart = function () {
+    $('.restart').show();
+    var gameView = this;
+    $('.restart').on('click', function () {
+      $('#score-form').off();
+      gameView.started = false;
+      gameView.allowInput = true;
+      window.cancelAnimationFrame(gameView.landingId);
+      gameView.showLanding();
+    });
   };
 
   GameView.prototype.start = function () {

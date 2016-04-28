@@ -22,6 +22,18 @@
   };
 
   MovingObject.prototype.draw = function() {
-    this.ctx.drawImage(this.image, this.pos[0], this.pos[1], this.width, this.height);
+    this.ctx.drawImage(
+        this.image, 
+        this.pos[0],
+        this.pos[1],
+        this.width,
+        this.height);
+  };
+
+  MovingObject.prototype.onScreen = function(){
+    return (this.pos[0] > 0 && 
+            this.pos[0] + this.width < this.ctx.canvas.width && 
+            this.pos[1] + this.height > 0 && 
+            this.pos[1] < this.ctx.canvas.height);
   };
 })();

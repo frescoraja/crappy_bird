@@ -44,8 +44,8 @@
   };
 
   Game.prototype.addBirdy = function (options) {
-    var startX = (this.ctx.canvas.width / 2) - (BIRDY_WIDTH / 2), 
-        startY = (this.ctx.canvas.height / 3) - (BIRDY_HEIGHT / 2),
+    var startX = Math.floor((this.ctx.canvas.width / 2) - (BIRDY_WIDTH / 2)), 
+        startY = Math.floor((this.ctx.canvas.height / 3) - (BIRDY_HEIGHT / 2)),
         birdOptions = {
           pos: [startX, startY],
           acc: BIRDY_ACC,
@@ -67,7 +67,7 @@
       ctx: this.ctx,
       birdy: this.birdy,
       pos: [].concat(this.birdy.pos),
-      vel: [].concat(this.birdy.vel),
+      vel: [0, 3],
       acc: DUDU_ACC,
       image: this.images.dudu
     };
@@ -119,7 +119,11 @@
   };
 
   Game.prototype.allObjects = function () {
-    return [].concat(this.sky, this.ground, this.obstacles, this.dudus, this.birdy);
+    return [].concat(this.sky,
+        this.ground,
+        this.obstacles,
+        this.dudus,
+        this.birdy);
   };
 
   Game.prototype.awardPoint = function () {
@@ -128,15 +132,19 @@
   };
 
   Game.prototype.birdyHitGround = function() {
-    return this.birdy.hitGround(this.ground.height);
+    if (this.birdy.hitGround(this.ground.height)) {
+      this.sounds.hit.play();
+      return true;
+    }
+    return false;
   };
   
   Game.prototype.birdyHitObstacle = function(obstacle) {
     if (!obstacle || this.over) return;
-    if ((this.birdy.pos[0] + this.birdy.width >= obstacle.pos[0] &&
-          this.birdy.pos[0] <= obstacle.pos[0] + obstacle.width) &&
-        (this.birdy.pos[1] <= obstacle.topOpening || 
-         this.birdy.pos[1] + this.birdy.height >= obstacle.bottomOpening)) {
+    if ((this.birdy.pos[0] + this.birdy.width > obstacle.pos[0] &&
+          this.birdy.pos[0] < obstacle.pos[0] + obstacle.width) &&
+        (this.birdy.pos[1] < obstacle.topOpening || 
+         this.birdy.pos[1] + this.birdy.height > obstacle.bottomOpening)) {
       this.sounds.die.play(); 
       return true;
     }
@@ -146,7 +154,6 @@
 
   Game.prototype.checkCollision = function () {
     if (this.birdyHitGround() || this.birdyHitObstacle(this.currentObstacle)) {
-      this.sounds.hit.play();
       this.over = true;
       this.birdy.dead = true;
     }
@@ -166,6 +173,12 @@
       dudu = this.dudus[idx];
       if (!dudu.onScreen()) {
         this.removeDudu(dudu, idx);
+      } else if (dudu.hitPipes(this.obstacles)) {
+        this.score += 10;
+        this.removeDudu(dudu, idx); 
+      } else if (dudu.hitGround(this.ground.height)) {
+        dudu.vel = this.ground.vel;
+        dudu.acc = this.ground.acc;
       }
     }
   };
@@ -183,6 +196,15 @@
   Game.prototype.draw = function () {
     this.allObjects().forEach(function (obj) {
       obj.draw();
+    });
+  };
+
+  Game.prototype.drawGameOver = function () {
+    this.allObjects().forEach(function (obj) {
+      if (!(obj instanceof CrappyBird.Birdy &&
+          obj instanceof CrappyBird.Dudu)) {
+        obj.vel = [0, 0];
+      }
     });
   };
 
