@@ -13,14 +13,26 @@
 
   GameView.prototype.bindHandlers = function () {
     var $startBtn = $('.press-start'),
-        $canvas = $('#game-canvas');
-    key('space', this.flyBirdOrStart.bind(this));
+        $canvas = $('#game-canvas'),
+        gameView = this;
+    key('space', function(event) {
+      event.preventDefault();
+      gameView.flyBirdOrStart();  
+    });
 
-    key('f', this.dropBomb.bind(this));
+    key('f', function(event) {
+      event.preventDefault();
+      gameView.dropBomb();
+    });
 
-    $canvas.click(this.flyBirdOrStart.bind(this));
+    $canvas.click(function(event) {
+      event.preventDefault();
+      gameView.flyBirdOrStart();
+    });
 
-    $startBtn.click(this.startGame.bind(this));
+    $startBtn.click(function(event) {
+      gameView.startGame(); 
+    });
   };
 
   GameView.prototype.flyBirdOrStart = function() {
