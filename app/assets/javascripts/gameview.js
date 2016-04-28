@@ -40,14 +40,12 @@
 
   GameView.prototype.handleGameOver = function () {
     this.allowInput = false;
-    this.sounds.die.play();
     var gameView = this,
         game = this.game,
         birdy = this.game.birdy;
     bird.vel = [0,.3];
     (function renderDead () {
       if (birdy.hitGround(game.ground.height)) {
-        game.sounds.hit.play();
         window.cancelAnimationFrame(gameView.deadId);
         setTimeout(gameView.showHighScores.bind(this), 750);
       } else {
@@ -146,49 +144,41 @@
     $('#scoreboard-container').hide();
     $('.restart').hide();
     $('.landing').show();
-    var dudu = { img: this.images.dudu,
-                 posX: 165,
-                 posY: 230,
-                 vel: 2,
-                 poo: this.sounds.poo
-               };
-    var options = {
-      birdyVel: [0, 1],
-      skyVel: [-0.5, 0],
-      groundVel: [-1, 0],
-      dudu: dudu,
-      ctx: this.ctx
+    var birdyOptions = {
+      acc: [0, 0],
+      imageIndices: [0, 3, 5],
     };
-    var view = this;
-    var ctx = this.ctx;
-    var ground = this.images.ground;
-    var birdyImg = birdy.img[3];
-    this.game = new CrappyBird.game(options);
+    var skyOptions = {
+      vel: [-0.5, 0],
+    };
+    var groundOptions = {
+      vel: [-1, 0],
+    };
+    var gameView = this,
+        ctx = this.ctx,
+        options = {
+          ctx: ctx,
+          birdyOpts: birdyOptions,
+          groundOpts: groundOptions,
+          skyOpts: skyOptions
+        };
+    this.game = new CrappyBird.Game(options, false);
+    var birdy = this.game.birdy;
+    var game = this.game;
     this.started = false;
     (function renderLanding () {
-      view.landingId = window.requestAnimationFrame(renderLanding);
+      gameView.landingId = window.requestAnimationFrame(renderLanding);
+
+      if (birdy.pos[1] <= (ctx.canvas.height / 3) - (birdy.height / 2)) {
+        birdy.vel = [0, 2];
+        game.addDudu();
+      } else if (birdy.pos[1] > (ctx.canvas.height / 3) - (birdy.height / 2) + 200) {
+        birdy.vel = [0, -2];
+      }
+      
       ctx.clearRect(0, 0, ctx.width, ctx.height);
-      ctx.drawImage(birdyImg, birdy.posX, birdy.posY, 50, 45);
-      ctx.drawImage(dudu.img, dudu.posX, dudu.posY, 15, 15);
-
-      if (dudu.posY === birdy.posY + 15) {
-        dudu.poo.play();
-      }
-
-      birdy.posY += birdy.vel;
-      dudu.vel += 0.2;
-      dudu.posY += dudu.vel;
-
-      if (birdy.posY >= 300) {
-        birdy.vel = -1;
-        birdyImg = birdy.img[0];
-      } else if (birdy.posY <= 215) {
-        birdy.vel = 1;
-        birdyImg = birdy.img[3];
-        dudu.vel = 2;
-        dudu.posY = birdy.posY + 15;
-        dudu.poo.play();
-      }
+      game.draw();
+      game.step();
     })();
   };
 
@@ -199,8 +189,11 @@
 
   GameView.prototype.start = function () {
     $('.landing').hide();
-    options = { ctx: this.ctx };
-    this.game = new CrappyBird.Game(options);
+
+    var options = { ctx: this.ctx };
+
+    this.game = new CrappyBird.Game(options, true);
+
     var gameView = this,
         ctx = this.ctx,
         game = this.game;

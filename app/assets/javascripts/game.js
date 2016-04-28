@@ -8,81 +8,103 @@
   //   increase gravity, or increase flying velocity
   // - obstacle velocity is tied to ground velocity, the faster
   //   it moves, the harder the game!
+  // check image.js for birdy image indices. alter at will!  
+  var BIRDY_HEIGHT      = 45;
+  var BIRDY_WIDTH       = 50;
+  var BIRDY_VEL         = [0, 0];
+  var BIRDY_FLY_VEL     = -10;
+  var BIRDY_ACC         = [0, 0.8];
+  var BIRDY_IMAGE_IDX   = [0, 4, 5];
+
+  var DUDU_VEL          = [0, 0];
+  var DUDU_ACC          = [0, 0.2];
+
+  var SKY_VEL           = [-1, 0];
+  var GROUND_VEL        = [-3, 0];
+
+  var FIRST_OBST_STARTX = 1000;
+
+  var PIPE_GAP_SIZE     = 130;
+  var PIPE_WIDTH        = 80;
   
-  BIRDY_HEIGHT      = 45;
-  BIRDY_WIDTH       = 50;
-  BIRDY_VEL         = [0, 0];
-  BIRDY_FLY_VEL     = -10;
-  BIRDY_ACC         = [0, 0.8];
-
-  DUDU_VEL          = [0, 0];
-  DUDU_ACC          = [0, 0.2];
-
-  SKY_VEL           = [-1, 0];
-  GROUND_VEL        = [-3, 0];
-
-  FIRST_OBST_STARTX = 1000;
-
-  PIPE_GAP_SIZE     = 130;
-  PIPE_WIDTH        = 80;
-  
-  var Game = CrappyBird.Game = function (options) {
-    this.birdyVel = options.birdyVel || BIRDY_VEL;
-    this.groundVel = options.groundVel || GROUND_VEL;
-    this.skyVel = options.skyVel || SKY_VEL;
-    this.dudu = options.dudu || [];
+  var Game = CrappyBird.Game = function (options, makeObstacles) {
     this.ctx             = options.ctx;
     this.images          = new CrappyBird.Images();
     this.sounds          = new CrappyBird.Sounds();
-    this.birdy           = this.addBirdy();
-    this.sky             = this.addSky();
-    this.ground          = this.addGround();
+    this.birdy           = this.addBirdy(options.birdyOpts);
+    this.sky             = this.addSky(options.skyOpts);
+    this.ground          = this.addGround(options.groundOpts);
     this.obstacles       = [];
-    this.currentObstacle = this.addObstacle(FIRST_OBST_STARTX);
+    this.dudus           = [];
     this.score           = 0;
     this.over            = false;
+    if (makeObstacles) {
+      this.currentObstacle = this.addObstacle(FIRST_OBST_STARTX);
+    }
   };
 
-  Game.prototype.addBirdy = function () {
+  Game.prototype.addBirdy = function (options) {
     var startX = (this.ctx.canvas.width / 2) - (BIRDY_WIDTH / 2), 
         startY = (this.ctx.canvas.height / 3) - (BIRDY_HEIGHT / 2),
-        birdy = new CrappyBird.Birdy({
+        birdOptions = {
           pos: [startX, startY],
-          vel: this.birdyVel,
           acc: BIRDY_ACC,
           fly_vel: BIRDY_FLY_VEL,
           width: BIRDY_WIDTH,
           height: BIRDY_HEIGHT,
+          imageIndices: BIRDY_IMAGE_IDX,
           images: this.images.birdies,
           ctx: this.ctx
-        });
-    return birdy;
+        };
+    
+    CrappyBird.Utils.merge(birdOptions, options);
+
+    return new CrappyBird.Birdy(birdOptions);
   };
 
-  Game.prototype.addGround = function() {
+  Game.prototype.addDudu = function() {
     var options = {
-      vel: this.groundVel,
+      ctx: this.ctx,
+      birdy: this.birdy,
+      pos: [].concat(this.birdy.pos),
+      vel: [].concat(this.birdy.vel),
+      acc: DUDU_ACC,
+      image: this.images.dudu
+    };
+    
+    var dudu = new CrappyBird.Dudu(options);
+    this.sounds.poo.play();
+    this.dudus.push(dudu);
+  };
+
+  Game.prototype.addGround = function(options) {
+    var groundOptions = {
+      vel: GROUND_VEL,
       image: this.images.ground,
       ctx: this.ctx
     };
 
-    return new CrappyBird.Ground(options);
+    CrappyBird.Utils.merge(groundOptions, options);
+
+    return new CrappyBird.Ground(groundOptions);
   };
   
-  Game.prototype.addSky = function() {
-    var options = {
-      vel: this.skyVel,
+  Game.prototype.addSky = function(options) {
+    var skyOptions = {
+      vel: SKY_VEL,
       image: this.images.sky,
       ctx: this.ctx
     };
 
-    return new CrappyBird.Sky(options);
+    CrappyBird.Utils.merge(skyOptions, options);
+
+    return new CrappyBird.Sky(skyOptions);
   };
 
   Game.prototype.addObstacle = function (startX) {
     var options = {
           pos: [startX, 0],
-          vel: this.groundVel,
+          vel: GROUND_VEL,
           gap: PIPE_GAP_SIZE,
           height: "N/A",
           width: PIPE_WIDTH,
@@ -97,7 +119,7 @@
   };
 
   Game.prototype.allObjects = function () {
-    return [].concat(this.sky, this.ground, this.obstacles, this.birdy, this.dudu);
+    return [].concat(this.sky, this.ground, this.obstacles, this.dudus, this.birdy);
   };
 
   Game.prototype.awardPoint = function () {
@@ -110,10 +132,12 @@
   };
   
   Game.prototype.birdyHitObstacle = function(obstacle) {
+    if (!obstacle || this.over) return;
     if ((this.birdy.pos[0] + this.birdy.width >= obstacle.pos[0] &&
           this.birdy.pos[0] <= obstacle.pos[0] + obstacle.width) &&
         (this.birdy.pos[1] <= obstacle.topOpening || 
          this.birdy.pos[1] + this.birdy.height >= obstacle.bottomOpening)) {
+      this.sounds.die.play(); 
       return true;
     }
 
@@ -122,24 +146,36 @@
 
   Game.prototype.checkCollision = function () {
     if (this.birdyHitGround() || this.birdyHitObstacle(this.currentObstacle)) {
+      this.sounds.hit.play();
       this.over = true;
       this.birdy.dead = true;
     }
   };
 
   Game.prototype.checkCurrentObstacle = function() {
+    if (!this.currentObstacle) return;
     if (this.currentObstacle.pos[0] + this.currentObstacle.width < this.birdy.pos[0]) {
       this.currentObstacle = this.addObstacle(this.ctx.canvas.width);
       this.awardPoint();
     }
   };
   
+  Game.prototype.checkDudu = function() {
+    var dudu;
+    for (var idx = 0; idx < this.dudus.length; idx++) {
+      dudu = this.dudus[idx];
+      if (!dudu.onScreen()) {
+        this.removeDudu(dudu, idx);
+      }
+    }
+  };
+
   Game.prototype.checkObstaclePosition = function () {
     var obstacle;
     for (var idx = 0; idx < this.obstacles.length; idx++) {
       obstacle = this.obstacles[idx];
       if (obstacle.pos[0] + obstacle.width < 0) {
-        this.remove(obstacle, idx);
+        this.removeObstacle(obstacle, idx);
       }  
     }
   };
@@ -155,17 +191,17 @@
     this.birdy.fly();
   };
 
-  Game.prototype.makeDudu = function() { 
-    if (this.dudu
-  };
-  
   Game.prototype.moveObjects = function () {
     this.allObjects().forEach(function (obj) {
       obj.move();
     });
   };
 
-  Game.prototype.remove = function (obj, idx) {
+  Game.prototype.removeDudu = function(dudu, idx) {
+    this.dudus.splice(idx, 1);
+  };
+
+  Game.prototype.removeObstacle = function (obj, idx) {
     this.obstacles.splice(idx, 1);
   };
 
@@ -173,6 +209,7 @@
     this.moveObjects();
     this.checkCurrentObstacle();
     this.checkObstaclePosition();
+    this.checkDudu();
     this.checkCollision();
 
     return this;

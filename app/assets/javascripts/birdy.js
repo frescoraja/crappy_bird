@@ -6,7 +6,9 @@
   var Birdy = CrappyBird.Birdy = function(options) {
     CrappyBird.MovingObject.call(this, options);
     this.fly_vel = options.fly_vel;
-    this.images = new CrappyBird.Images().birdies;
+    this.images = options.images;
+    this.imageIndices = options.imageIndices;
+    this.setBirdyImages();
     this.dead = false;
   };
   
@@ -26,13 +28,19 @@
 
   Birdy.prototype.draw = function () {
     if (this.dead) {
-      this.image = this.images[5];
+      this.image = this.deadImg;
     } else if (this.falling()) {
-      this.image = this.images[4];
+      this.image = this.fallingImg;
     } else {
-      this.image = this.images[0];
+      this.image = this.flyingImg;
     }
 
     CrappyBird.MovingObject.prototype.draw.call(this);
+  };
+
+  Birdy.prototype.setBirdyImages = function() {
+    this.deadImg = this.images[this.imageIndices[2]];
+    this.fallingImg = this.images[this.imageIndices[1]];
+    this.flyingImg = this.images[this.imageIndices[0]];
   };
 })();

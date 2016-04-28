@@ -39,5 +39,7 @@
     this.pipes = [this.pipeTop, this.pipeBottom];
     this.dudu = new Image();
     this.dudu.src = "assets/dudu.png";
+    this.dudu.height = 15;
+    this.dudu.width = 15;
   };
 })();

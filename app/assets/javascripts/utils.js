@@ -16,4 +16,12 @@
       }
     });
   }
+
+  Utils.merge = function(obj1, obj2) {
+    for (var key in obj2) {
+      if (obj2 !== undefined) {
+        obj1[key] = obj2[key];
+      }
+    }
+  };
 })();
