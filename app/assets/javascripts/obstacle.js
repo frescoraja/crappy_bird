@@ -20,11 +20,11 @@
   Obstacle.prototype.generateHeights = function () {
     var aboveGround = this.ctx.canvas.height - this.game.ground.height;
     var pipeAbleSpace = aboveGround - this.gap;
-    var minHeight =  pipeAbleSpace * 0.1;
-    var maxHeight = pipeAbleSpace * 0.9;
+    var minHeight =  parseInt(pipeAbleSpace * 0.1);
+    var maxHeight = parseInt(pipeAbleSpace * 0.9);
 
     var topHeight = Math.floor(Math.random() * (maxHeight - minHeight)) + minHeight;
-    var bottomHeight = pipeAbleSpace - topHeight;
+    var bottomHeight = parseInt(pipeAbleSpace - topHeight);
     return [bottomHeight, topHeight];
   };
   
@@ -35,7 +35,7 @@
     this.ctx.drawImage(this.pipes[1],
                   0, 0,
                   this.pipes[1].width, (this.bottomHeight / this.ctx.canvas.height) * this.pipes[1].height,
-                  this.pos[0], this.ctx.canvas.height - 100 - this.bottomHeight,
+                  this.pos[0], this.ctx.canvas.height - this.game.ground.height - this.bottomHeight,
                   this.width, this.bottomHeight);
   };
 })();

@@ -110,7 +110,7 @@
           width: PIPE_WIDTH,
           ctx: this.ctx,
           game: this,
-          images: this.images.pipes,
+          images: this.images.pipes
     };
     var obstacle = new CrappyBird.Obstacle(options);
     this.obstacles.push(obstacle);
@@ -141,7 +141,19 @@
   
   Game.prototype.birdyHitObstacle = function(obstacle) {
     if (!obstacle || this.over) return;
-    if ((this.birdy.pos[0] + this.birdy.width > obstacle.pos[0] &&
+    var birdyCtr = this.birdy.centerPt();
+    if ((this.birdy.pos[0] + this.birdy.width > obstacle.pos[0]) && (birdyCtr[0] < obstacle.pos[0])) {
+      if (this.birdy.collisionDetect(obstacle, 'left')) {
+        this.sounds.die.play();
+        return true;
+      }
+    } else if ((birdyCtr[0] > obstacle.pos[0] + obstacle.width) &&
+            (this.birdy.pos[0] < obstacle.pos[0])) {
+      if (this.birdy.collisionDetect(obstacle, 'right')) {
+        this.sounds.die.play();
+        return true;
+      }
+    } else if ((this.birdy.pos[0] + this.birdy.width > obstacle.pos[0] &&
           this.birdy.pos[0] < obstacle.pos[0] + obstacle.width) &&
         (this.birdy.pos[1] < obstacle.topOpening || 
          this.birdy.pos[1] + this.birdy.height > obstacle.bottomOpening)) {

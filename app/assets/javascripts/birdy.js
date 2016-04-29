@@ -14,6 +14,13 @@
   
   CrappyBird.Utils.inherits(Birdy, CrappyBird.MovingObject);
 
+  Birdy.prototype.centerPt = function() {
+    var centerX = Math.floor(this.pos[0] + (this.width / 2)),
+        centerY = Math.floor(this.pos[1] + (this.height / 2));
+
+    return [centerX, centerY];
+  };
+
   Birdy.prototype.fly = function() {
     this.vel[1] = this.fly_vel;
   };
@@ -24,6 +31,22 @@
   
   Birdy.prototype.hitGround = function(groundHeight) {
     return this.pos[1] + this.height >= (this.ctx.canvas.height - groundHeight);
+  };
+  
+  Birdy.prototype.collisionDetect = function(obstacle, side) {
+    var offset = side === 'left' ? 0 : obstacle.width;
+    var topCorner = [obstacle.pos[0] + offset, obstacle.topOpening],
+        bottomCorner = [obstacle.pos[0] + offset, obstacle.bottomOpening], 
+        birdCtr = this.centerPt(),
+    
+        difX = Math.abs(birdCtr[0] - topCorner[0]),
+        difYTop = Math.abs(birdCtr[1] - topCorner[1]),
+        difYBtm = Math.abs(birdCtr[1] - bottomCorner[1]),
+
+        distToTop = Math.sqrt(Math.pow(difX, 2) + Math.pow(difYTop, 2)),
+        distToBtm = Math.sqrt(Math.pow(difX, 2) + Math.pow(difYBtm, 2));
+
+    return (distToTop < (this.width / 2) || distToBtm < (this.width / 2));       
   };
 
   Birdy.prototype.draw = function () {
