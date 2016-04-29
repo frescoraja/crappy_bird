@@ -42,8 +42,8 @@
         dyt = closestYtop - center[1];
         dyb = closestYbtm - center[1];
 
-    return (( dx * dx + dyt * dyt ) <= Math.pow(this.width / 2, 2) || 
-            (dx * dx + dyb * dyb ) <= Math.pow(this.height / 2, 2));
+    return (( dx * dx + dyt * dyt ) < (Math.pow(this.width / 2, 2) - 225) || 
+            (dx * dx + dyb * dyb ) < (Math.pow(this.width / 2, 2) - 225));
   };
 
   Birdy.prototype.draw = function () {

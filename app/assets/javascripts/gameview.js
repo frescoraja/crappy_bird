@@ -112,6 +112,7 @@
           var msg = res.responseText;
           $('.errors').text(msg);
           $("#input-name").prop("disabled", false);
+          $("#input-name").focus();
         }
       });
     });
