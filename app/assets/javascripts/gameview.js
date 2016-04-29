@@ -129,7 +129,7 @@
         if (res.length === 0) {
           if (score > 0) {
             gameView.showScoreForm(score);
-            $("#input-name").prop("disabled", false);
+            $("#input-name").prop("disabled", false).focus();
           } else {
             gameView.showRestart();
           }
@@ -144,6 +144,7 @@
           var lowScore = parseInt(res.reverse()[0].score);
           if (score >= lowScore || (res.length < 10 && score > 0)) {
             gameView.showScoreForm(score);
+            $("#input-name").prop("disabled", false).focus();
           } else {
             gameView.showRestart();
           }
