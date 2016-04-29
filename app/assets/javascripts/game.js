@@ -145,7 +145,6 @@
       this.sounds.die.play();
       return true;
     }
-
     return false;
   };
 
