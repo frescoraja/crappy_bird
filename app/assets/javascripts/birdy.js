@@ -32,21 +32,18 @@
   Birdy.prototype.hitGround = function(groundHeight) {
     return this.pos[1] + this.height >= (this.ctx.canvas.height - groundHeight);
   };
-  
-  Birdy.prototype.collisionDetect = function(obstacle, side) {
-    var offset = side === 'left' ? 0 : obstacle.width;
-    var topCorner = [obstacle.pos[0] + offset, obstacle.topOpening],
-        bottomCorner = [obstacle.pos[0] + offset, obstacle.bottomOpening], 
-        birdCtr = this.centerPt(),
-    
-        difX = Math.abs(birdCtr[0] - topCorner[0]),
-        difYTop = Math.abs(birdCtr[1] - topCorner[1]),
-        difYBtm = Math.abs(birdCtr[1] - bottomCorner[1]),
 
-        distToTop = Math.sqrt(Math.pow(difX, 2) + Math.pow(difYTop, 2)),
-        distToBtm = Math.sqrt(Math.pow(difX, 2) + Math.pow(difYBtm, 2));
+  Birdy.prototype.intersects = function(obstacle) {
+    var center = this.centerPt(),
+        closestX = (center[0] < obstacle.pos[0] ? obstacle.pos[0] : (center[0] > obstacle.pos[0] + obstacle.width ? obstacle.pos[0] + obstacle.width : center[0])),
+        closestYtop = (center[1] < obstacle.pos[1] ? obstacle.pos[1] : (center[1] > obstacle.topOpening ? obstacle.topOpening : center[1])),
+        closestYbtm = (center[1] < obstacle.bottomOpening ? obstacle.bottomOpening : (center[1] > obstacle.bottomOpening + obstacle.bottomHeight ? obstacle.bottomOpening + obstacle.bottomHeight : center[1])),
+        dx = closestX - center[0],
+        dyt = closestYtop - center[1];
+        dyb = closestYbtm - center[1];
 
-    return (distToTop < (this.width / 2) || distToBtm < (this.width / 2));       
+    return (( dx * dx + dyt * dyt ) <= Math.pow(this.width / 2, 2) || 
+            (dx * dx + dyb * dyb ) <= Math.pow(this.height / 2, 2));
   };
 
   Birdy.prototype.draw = function () {

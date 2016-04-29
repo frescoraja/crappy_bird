@@ -141,27 +141,12 @@
   
   Game.prototype.birdyHitObstacle = function(obstacle) {
     if (!obstacle || this.over) return;
-    var birdyCtr = this.birdy.centerPt();
-    if ((this.birdy.pos[0] + this.birdy.width > obstacle.pos[0]) && (birdyCtr[0] < obstacle.pos[0])) {
-      if (this.birdy.collisionDetect(obstacle, 'left')) {
-        this.sounds.die.play();
-        return true;
-      }
-    } else if ((birdyCtr[0] > obstacle.pos[0] + obstacle.width) &&
-            (this.birdy.pos[0] < obstacle.pos[0])) {
-      if (this.birdy.collisionDetect(obstacle, 'right')) {
-        this.sounds.die.play();
-        return true;
-      }
-    } else if ((this.birdy.pos[0] + this.birdy.width > obstacle.pos[0] &&
-          this.birdy.pos[0] < obstacle.pos[0] + obstacle.width) &&
-        (this.birdy.pos[1] < obstacle.topOpening || 
-         this.birdy.pos[1] + this.birdy.height > obstacle.bottomOpening)) {
-      this.sounds.die.play(); 
+    if (this.birdy.intersects(obstacle)) {
+      this.sounds.die.play();
       return true;
     }
 
-    return false; 
+    return false;
   };
 
   Game.prototype.checkCollision = function () {
