@@ -3,7 +3,6 @@
     window.CrappyBird = {};
   }
 
-
   var GameView = CrappyBird.GameView = function (ctx) {
     this.ctx = ctx;
     this.started = false;

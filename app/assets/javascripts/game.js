@@ -12,15 +12,15 @@
   var BIRDY_HEIGHT      = 45;
   var BIRDY_WIDTH       = 50;
   var BIRDY_VEL         = [0, 0];
-  var BIRDY_FLY_VEL     = -10;
-  var BIRDY_ACC         = [0, 0.8];
+  var BIRDY_FLY_VEL     = -9;
+  var BIRDY_ACC         = [0, 0.7];
   var BIRDY_IMAGE_IDX   = [0, 4, 5];
   var FORGIVENESS_FACTOR = Math.pow(15, 2); //gives 15px safe-zone to account for transparent pixels around rotated bird image
 
   var DUDU_VEL          = [0, 0];
-  var DUDU_ACC          = [0, 0.2];
+  var DUDU_ACC          = [0, 0.3];
 
-  var SKY_VEL           = [-1, 0];
+  var SKY_VEL           = [-1.5, 0];
   var GROUND_VEL        = [-3, 0];
 
   var FIRST_OBST_STARTX = 1000;
@@ -38,6 +38,7 @@
     this.obstacles       = [];
     this.dudus           = [];
     this.score           = 0;
+    this.duduScore       = 0;
     this.over            = false;
     if (makeObstacles) {
       this.currentObstacle = this.addObstacle(FIRST_OBST_STARTX);
@@ -172,7 +173,8 @@
       if (!dudu.onScreen()) {
         this.removeDudu(dudu, idx);
       } else if (dudu.hitPipes(this.obstacles)) {
-        this.score += this.score + 1;
+        this.duduScore += 1;
+        this.score += this.duduScore;
         this.removeDudu(dudu, idx); 
       } else if (dudu.hitGround(this.ground.height)) {
         dudu.vel = this.ground.vel;
@@ -231,7 +233,7 @@
     this.checkObstaclePosition();
     this.checkDudu();
     this.checkCollision();
-
+    
     return this;
   };
 })();
