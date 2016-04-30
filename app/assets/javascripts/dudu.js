@@ -15,7 +15,7 @@
   };
 
   Dudu.prototype.hitPipes = function(pipes) {
-    for (var i; i < pipes.length; i++) {
+    for (var i = 0; i < pipes.length; i++) {
       if ((this.pos[0] > pipes[i].pos[0] && 
             this.pos[0] + this.width < pipes[i].pos[0] + pipes[i].width) &&
           (this.pos[1] + this.height > pipes[i].bottomOpening)) {

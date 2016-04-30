@@ -15,6 +15,7 @@
   var BIRDY_FLY_VEL     = -10;
   var BIRDY_ACC         = [0, 0.8];
   var BIRDY_IMAGE_IDX   = [0, 4, 5];
+  var FORGIVENESS_FACTOR = Math.pow(15, 2); //gives 15px safe-zone to account for transparent pixels around rotated bird image
 
   var DUDU_VEL          = [0, 0];
   var DUDU_ACC          = [0, 0.2];
@@ -54,7 +55,8 @@
           height: BIRDY_HEIGHT,
           imageIndices: BIRDY_IMAGE_IDX,
           images: this.images.birdies,
-          ctx: this.ctx
+          ctx: this.ctx,
+          ff: FORGIVENESS_FACTOR
         };
     
     CrappyBird.Utils.merge(birdOptions, options);
@@ -170,7 +172,7 @@
       if (!dudu.onScreen()) {
         this.removeDudu(dudu, idx);
       } else if (dudu.hitPipes(this.obstacles)) {
-        this.score += 10;
+        this.score += this.score + 1;
         this.removeDudu(dudu, idx); 
       } else if (dudu.hitGround(this.ground.height)) {
         dudu.vel = this.ground.vel;

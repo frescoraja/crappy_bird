@@ -10,6 +10,7 @@
     this.imageIndices = options.imageIndices;
     this.setBirdyImages();
     this.dead = false;
+    this._FF = options.ff;
   };
   
   CrappyBird.Utils.inherits(Birdy, CrappyBird.MovingObject);
@@ -42,8 +43,8 @@
         dyt = closestYtop - center[1];
         dyb = closestYbtm - center[1];
 
-    return (( dx * dx + dyt * dyt ) < (Math.pow(this.width / 2, 2)) || 
-            (dx * dx + dyb * dyb ) < (Math.pow(this.width / 2, 2)));
+    return (( dx * dx + dyt * dyt ) < (Math.pow(this.width / 2, 2) - this._FF) || 
+            (dx * dx + dyb * dyb ) < (Math.pow(this.width / 2, 2)) - this._FF);
   };
 
   Birdy.prototype.draw = function () {

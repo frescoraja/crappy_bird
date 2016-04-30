@@ -131,10 +131,16 @@ td {
 .restart {
   display: none;
   font-size: 12px;
-  bottom: 10%;
+  bottom: 34px;
   width: 30%;
   left: 35%;
   padding: 2px;
+}
+
+.restart:hover {
+  bottom: 32px;
+  box-shadow: 0px 7px 2px rgba(0, 0, 0, 0.91);
+  cursor: pointer;
 }
 
 .user-score {
@@ -163,10 +169,6 @@ td {
   display: none;
   width: 75%;
   margin: auto;
-}
-
-.restart:hover {
-  cursor: pointer;
 }
 
 table tr:nth-child(even) {
