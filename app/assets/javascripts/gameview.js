@@ -151,7 +151,14 @@
           if (numTableRows >= 10) {
             $('tr').last().remove();
           }
-          $scoreBoard.append($newTableData);
+          $('tr').each(function(i, row) {
+            var rowScore = Number($(row).text().slice(-4));
+            if (rowScore < res.score) {
+              $(row).before($newTableData);
+              $newTableData = "";
+            }
+          });
+          if ($newTableData) $scoreBoard.append($newTableData);
           gameView.showRestart();
         },
         error: function (res) {
