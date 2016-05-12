@@ -1,6 +1,6 @@
 #CrappyBird! 
 
-<a href="http://crappybird.herokuapp.com">Live Link</a>
+<a href="http://cb.djc.space">Live Link</a>
 
 ##Flappy Bird - made by me with JavaScript on Independence Day, 2015
 
