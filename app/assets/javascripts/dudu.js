@@ -11,7 +11,7 @@
   CrappyBird.Utils.inherits(Dudu, CrappyBird.MovingObject);
   
   Dudu.prototype.hitGround = function(groundHeight) {
-    return (this.pos[1] + this.height >= this.ctx.canvas.height - groundHeight);
+    return (this.pos[1] >= this.ctx.canvas.height - groundHeight);
   };
 
   Dudu.prototype.hitPipes = function(pipes) {
