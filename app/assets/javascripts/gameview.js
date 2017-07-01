@@ -54,6 +54,7 @@
   GameView.prototype.startGame = function() {
     window.cancelAnimationFrame(window.animateId);
     $('.landing').hide();
+    $('.hint').hide();
     this.started = true;
     this.start();
   };
@@ -189,6 +190,7 @@
   GameView.prototype.showLanding = function () {
     this.allowInput = true;
     $('.landing').show();
+    $('.hint').show();
     window.cancelAnimationFrame(window.animateId);
     var birdyOptions = {
       vel: [0, -0.5],
