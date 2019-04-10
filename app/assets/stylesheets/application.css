@@ -120,7 +120,6 @@ input {
 
 .scoreboard {
   width: 80%;
-  height: 50%;
   top: 5%;
   left: 10%;
   padding: 20px;
@@ -155,13 +154,11 @@ td {
 }
 
 .user-score {
-  text-align: left;
   width: 40%;
   left: 30%;
-  bottom: 20%;
+  bottom: 24%;
   padding-top: 10px;
   padding-bottom: 10px;
-  padding-left: 10px;
 }
 
 .user-score span {
